@@ -1,12 +1,20 @@
-using Azure;
+using EPR.LiveService.FunctionApp.Repositories.Interfaces;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using System.Net;
+using System.Text.Json;
 
 namespace MyFunctionApp;
 
 public class HelloWorldFunction
 {
+    private readonly IOrganisationRepository _organisationRepository;
+
+    public HelloWorldFunction(IOrganisationRepository organisationRepository)
+    {
+        _organisationRepository = organisationRepository;
+    }
+
     [Function("HelloWorld")]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get")] HttpRequestData req)
@@ -20,8 +28,10 @@ public class HelloWorldFunction
           return badrequest;
         }
 
+        var organisationQueryResponse = await _organisationRepository.GetOrganisationByOrgRefAsync(orgRef);
+
         var response = req.CreateResponse(HttpStatusCode.OK);
-        await response.WriteStringAsync(orgRef);
+        await response.WriteStringAsync(JsonSerializer.Serialize(organisationQueryResponse));
 
         return response;
     }
