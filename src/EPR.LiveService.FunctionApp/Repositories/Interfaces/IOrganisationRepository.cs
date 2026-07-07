@@ -4,5 +4,5 @@ namespace EPR.LiveService.FunctionApp.Repositories.Interfaces;
 
 public interface IOrganisationRepository
 {
-    Task<GetOrganisationByOrgRefResults?> GetOrganisationByOrgRefAsync(string orgRef);
+    Task<IEnumerable<GetOrganisationByOrgRefResults>> GetOrganisationByOrgRefAsync(string orgRef);
 }

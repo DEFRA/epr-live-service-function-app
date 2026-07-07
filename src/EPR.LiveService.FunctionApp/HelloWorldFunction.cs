@@ -30,6 +30,11 @@ public class HelloWorldFunction
 
         var organisationQueryResponse = await _organisationRepository.GetOrganisationByOrgRefAsync(orgRef);
 
+        if(organisationQueryResponse.Count() ==0)
+        {
+            return req.CreateResponse(HttpStatusCode.NoContent);
+        }
+
         var response = req.CreateResponse(HttpStatusCode.OK);
         await response.WriteStringAsync(JsonSerializer.Serialize(organisationQueryResponse));
 
