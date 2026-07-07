@@ -1,5 +1,4 @@
 ﻿using Dapper;
-using EPR.LiveService.FunctionApp.Models;
 using EPR.LiveService.FunctionApp.Repositories.Interfaces;
 using EPR.LiveService.Functions.Repositories;
 
@@ -13,11 +12,11 @@ public class OrganisationRepository : RepositoryBase, IOrganisationRepository
     {
     }
 
-    public async Task<IEnumerable<GetOrganisationByOrgRefResults>> GetOrganisationByOrgRefAsync(string orgRef)
+    public async Task<IEnumerable<dynamic>> GetOrganisationByOrgRefAsync(string referenceNumber)
     {
         var parameters = new 
         { 
-            OrgRef = orgRef 
+            ReferenceNumber = referenceNumber 
         };
 
         var sql = @"
@@ -56,11 +55,11 @@ public class OrganisationRepository : RepositoryBase, IOrganisationRepository
               INNER JOIN Users u ON u.Id = p.UserId
               INNER JOIN Nations nat ON nat.Id = org.NationId
             WHERE
-              org.ReferenceNumber = @OrgRef
+              org.ReferenceNumber = @ReferenceNumber
             ORDER BY org.Name";
 
         var getOrganisationByOrgRefResults = await WithConnectionAsync((connection, transaction) =>
-            connection.QueryAsync<GetOrganisationByOrgRefResults>(sql, parameters, transaction));
+            connection.QueryAsync<dynamic>(sql, parameters, transaction));
 
         return getOrganisationByOrgRefResults.ToList();
     }

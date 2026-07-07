@@ -1,8 +1,6 @@
-﻿using EPR.LiveService.FunctionApp.Models;
-
-namespace EPR.LiveService.FunctionApp.Repositories.Interfaces;
+﻿namespace EPR.LiveService.FunctionApp.Repositories.Interfaces;
 
 public interface IOrganisationRepository
 {
-    Task<IEnumerable<GetOrganisationByOrgRefResults>> GetOrganisationByOrgRefAsync(string orgRef);
+    Task<IEnumerable<dynamic>> GetOrganisationByOrgRefAsync(string orgRef);
 }
