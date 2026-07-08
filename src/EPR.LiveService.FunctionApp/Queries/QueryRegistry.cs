@@ -10,8 +10,14 @@ namespace EPR.LiveService.FunctionApp.Queries;
 /// </summary>
 public class QueryRegistry : IQueryRegistry
 {
+
     private const string DefinitionsResourceNamespace = "Queries.Definitions";
     private const string ScriptsResourceNamespace = "Queries.Scripts";
+
+    private static readonly JsonSerializerOptions DeserializationOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
 
     private readonly Assembly _assembly = typeof(QueryRegistry).Assembly;
     private readonly Dictionary<string, QueryDefinition> _definitions;
@@ -46,12 +52,10 @@ public class QueryRegistry : IQueryRegistry
         return await reader.ReadToEndAsync();
     }
 
-    private QueryDefinition LoadDefinition(string resourceName)
+   private QueryDefinition LoadDefinition(string resourceName)
     {
         using var stream = _assembly.GetManifestResourceStream(resourceName)!;
-        var definition = JsonSerializer.Deserialize<QueryDefinition>(
-            stream,
-            new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+        var definition = JsonSerializer.Deserialize<QueryDefinition>(stream, DeserializationOptions);
 
         return definition ?? throw new InvalidOperationException(
             $"Failed to deserialize query definition from '{resourceName}'");

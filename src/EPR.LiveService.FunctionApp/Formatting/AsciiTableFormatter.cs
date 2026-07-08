@@ -8,7 +8,7 @@ public static class AsciiTableFormatter
     public static string ToAsciiTable(IEnumerable<dynamic> rows)
     {
         var list = rows.Cast<IDictionary<string, object>>().ToList();
-        if (!list.Any()) return "(no rows)";
+        if (list.Count == 0) return "(no rows)";
 
         var columns = list[0].Keys.ToList();
         var widths = columns.Select(c => Math.Max(c.Length,
@@ -29,30 +29,6 @@ public static class AsciiTableFormatter
         return sb.ToString();
     }
 
-    public static string WrapAsHtml(string asciiTable)
-    {
-        var escaped = WebUtility.HtmlEncode(asciiTable);
-
-        return $$"""
-        <!DOCTYPE html>
-        <html>
-        <head>
-            <meta charset="utf-8">
-            <style>
-                body { margin: 0; padding: 1rem; background: #1e1e1e; }
-                pre { font-family: 'Consolas', 'Courier New', monospace;
-                    font-size: 13px;
-                    color: #d4d4d4;
-                    white-space: pre;
-                    overflow-x: auto;
-                    margin: 0;
-                }
-            </style>
-        </head>
-        <body>
-            <pre>{{escaped}}</pre>
-        </body>
-        </html>
-        """;
-    }
+    public static string WrapAsFragment(string asciiTable) =>
+        $"<pre>{WebUtility.HtmlEncode(asciiTable)}</pre>";
 }

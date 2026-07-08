@@ -23,7 +23,7 @@ public class RunQueryFunction
 
     [Function("RunQuery")]
     public async Task<HttpResponseData> Run(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "query/{queryId}")] HttpRequestData req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "query/{queryId}/results")] HttpRequestData req,
         string queryId)
     {
         QueryDefinition definition;
@@ -63,7 +63,10 @@ public class RunQueryFunction
 
         if (records.Count == 0)
         {
-            return req.CreateResponse(HttpStatusCode.NoContent);
+            var noContent = req.CreateResponse(HttpStatusCode.OK);
+            noContent.Headers.Add("Content-Type", "text/html; charset=utf-8");
+            await noContent.WriteStringAsync(AsciiTableFormatter.WrapAsFragment("(no rows)"));
+            return noContent;
         }
 
         switch (option)
@@ -86,8 +89,9 @@ public class RunQueryFunction
             {
                 var response = req.CreateResponse(HttpStatusCode.OK);
                 response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-                await response.WriteStringAsync(
-                    AsciiTableFormatter.WrapAsHtml(AsciiTableFormatter.ToAsciiTable(records)));
+
+                var table = AsciiTableFormatter.ToAsciiTable(records);
+                await response.WriteStringAsync(AsciiTableFormatter.WrapAsFragment(table));
 
                 return response;
             }
