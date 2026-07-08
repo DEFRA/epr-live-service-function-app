@@ -4,6 +4,6 @@
   "description": "For a given Reference Number, returns a complete history of all entries in dbo.AuditLog",
   "target": "accounts", 
   "parameters": [
-    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "number", "required": true }
+    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "text", "required": true }
   ]
 }

@@ -42,5 +42,5 @@ The `QueryRegistry` loads both as embedded resources at startup and validates ev
 |---|---|
 | `GET /api/queries` | HTML list of all registered queries, linking to each form |
 | `GET /api/query/{queryId}` | Auto-generated HTML form for the query's parameters |
-| `GET /api/query/{queryId}/results?{params}` | Runs the query, returns results (`?option=ascii_table` default, or `?option=csv`) |
+| `GET /api/query/{queryId}/results?{params}` | Runs the query, returns results (`?output=ascii_table` default, or `?output=csv`) |
 

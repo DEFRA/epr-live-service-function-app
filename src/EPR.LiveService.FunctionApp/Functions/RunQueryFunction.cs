@@ -50,10 +50,10 @@ public class RunQueryFunction
             return badRequest;
         }
 
-        var option = req.Query.Get("option");
-        if (string.IsNullOrWhiteSpace(option))
+        var output = req.Query.Get("output");
+        if (string.IsNullOrWhiteSpace(output))
         {
-            option = "ascii_table";
+            output = "ascii_table";
         }
 
         using var connection = await _connectionFactory.CreateConnectionAsync(definition.Target);
@@ -69,7 +69,7 @@ public class RunQueryFunction
             return noContent;
         }
 
-        switch (option)
+        switch (output)
         {
             case "csv":
             {
@@ -98,7 +98,7 @@ public class RunQueryFunction
             default:
             {
                 var badRequest = req.CreateResponse(HttpStatusCode.BadRequest);
-                await badRequest.WriteStringAsync($"Unknown option: {option}");
+                await badRequest.WriteStringAsync($"Unknown option: {output}");
                 return badRequest;
             }
         }

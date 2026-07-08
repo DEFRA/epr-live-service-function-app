@@ -34,7 +34,13 @@ public static class QueryFormPage
             <style>
                 body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; background: #1e1e1e; color: #d4d4d4; }
                 label { display: block; margin-top: 0.75rem; font-weight: 600; }
-                input { width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box; }
+                input[type="text"], input[type="number"], input[type="date"] {
+                    width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box;
+                }
+                fieldset { margin-top: 1rem; border: 1px solid #3a3a3a; border-radius: 4px; padding: 0.75rem 1rem; }
+                legend { font-weight: 600; padding: 0 0.4rem; }
+                .radio-option { font-weight: normal; display: flex; align-items: center; gap: 0.4rem; margin-top: 0.4rem; }
+                .radio-option input { width: auto; margin: 0; }
                 button { margin-top: 1.25rem; padding: 0.5rem 1.2rem; }
                 #results { margin-top: 1.5rem; }
                 pre { overflow-x: auto; }
@@ -47,6 +53,19 @@ public static class QueryFormPage
 
             <form id="query-form">
                 {{fields}}
+
+                <fieldset>
+                    <legend>Output format</legend>
+                    <label class="radio-option">
+                        <input type="radio" name="output" value="ascii_table" checked />
+                        ASCII table
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="output" value="csv" />
+                        CSV
+                    </label>
+                </fieldset>
+
                 <button type="submit">Run query</button>
             </form>
 
