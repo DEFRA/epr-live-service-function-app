@@ -31,8 +31,9 @@ public static class QueryFormPage
         <head>
             <meta charset="utf-8">
             <title>{{WebUtility.HtmlEncode(definition.DisplayName)}}</title>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
             <style>
-                body { font-family: system-ui, sans-serif; max-width: 700px; margin: 2rem auto; background: #1e1e1e; color: #d4d4d4; }
+                body { font-family: system-ui, sans-serif; max-width: 900px; margin: 2rem auto; background: #1e1e1e; color: #d4d4d4; }
                 label { display: block; margin-top: 0.75rem; font-weight: 600; }
                 input[type="text"], input[type="number"], input[type="date"] {
                     width: 100%; padding: 0.4rem; margin-top: 0.25rem; box-sizing: border-box;
@@ -41,9 +42,25 @@ public static class QueryFormPage
                 legend { font-weight: 600; padding: 0 0.4rem; }
                 .radio-option { font-weight: normal; display: flex; align-items: center; gap: 0.4rem; margin-top: 0.4rem; }
                 .radio-option input { width: auto; margin: 0; }
+                .option-hint { color: #aaaaaa; font-weight: normal; margin-left: 0.3rem; }
                 button { margin-top: 1.25rem; padding: 0.5rem 1.2rem; }
                 #results { margin-top: 1.5rem; }
-                pre { overflow-x: auto; }
+
+                .query-results-list { margin-top: 1rem; }
+                .table-scroll { overflow-x: auto; max-width: 100%; }
+
+                table { border-collapse: collapse; }
+                th, td {
+                    border: 1px solid #3a3a3a;
+                    padding: 0.4rem 0.6rem;
+                    text-align: left;
+                    white-space: nowrap;
+                }
+                th { cursor: pointer; user-select: none; background: #2a2a2a; }
+                th:hover { background: #333; }
+                th.asc::after { content: ' ▲'; }
+                th.desc::after { content: ' ▼'; }
+
                 .error { color: #ff6b6b; }
             </style>
         </head>
@@ -57,12 +74,19 @@ public static class QueryFormPage
                 <fieldset>
                     <legend>Output format</legend>
                     <label class="radio-option">
-                        <input type="radio" name="output" value="ascii_table" checked />
-                        ASCII table
+                        <input type="radio" name="output" value="html" checked />
+                        HTML Table
+                        <span class="option-hint">— sortable by column</span>
+                    </label>
+                    <label class="radio-option">
+                        <input type="radio" name="output" value="ascii_table" />
+                        ASCII Table
+                        <span class="option-hint">— good for copy-pasting, nicely formatted</span>
                     </label>
                     <label class="radio-option">
                         <input type="radio" name="output" value="csv" />
                         CSV
+                        <span class="option-hint">— best for large result sets</span>
                     </label>
                 </fieldset>
 
@@ -77,18 +101,31 @@ public static class QueryFormPage
                 document.getElementById('query-form').addEventListener('submit', async (e) => {
                     e.preventDefault();
                     const params = new URLSearchParams(new FormData(e.target));
+                    const url = `/api/query/${queryId}/results?${params.toString()}`;
+
+                    if (params.get('output') === 'csv') {
+                        window.location.href = url;
+                        return;
+                    }
 
                     const resultsDiv = document.getElementById('results');
                     resultsDiv.innerHTML = '<p>Running…</p>';
 
                     try {
-                        const res = await fetch(`/api/query/${queryId}/results?${params.toString()}`);
+                        const res = await fetch(url);
                         const html = await res.text();
                         if (!res.ok) {
                             resultsDiv.innerHTML = `<p class="error">${html}</p>`;
                             return;
                         }
                         resultsDiv.innerHTML = html;
+
+                        const container = document.getElementById('query-results-list');
+                        if (container) {
+                            const valueNames = Array.from(container.querySelectorAll('th[data-sort]'))
+                                .map(th => th.dataset.sort);
+                            new List('query-results-list', { valueNames });
+                        }
                     } catch (err) {
                         resultsDiv.innerHTML = `<p class="error">${err.message}</p>`;
                     }

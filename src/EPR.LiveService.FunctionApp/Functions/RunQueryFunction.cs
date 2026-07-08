@@ -74,15 +74,16 @@ public class RunQueryFunction
             case "csv":
             {
                 var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "text/plain; charset=utf-8");
-
+                response.Headers.Add("Content-Type", "text/csv; charset=utf-8");
+                response.Headers.Add("Content-Disposition", $"attachment; filename=\"{queryId}.csv\"");
+            
                 await using var streamWriter = new StreamWriter(response.Body, leaveOpen: true);
                 await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
-
+            
                 await csvWriter.WriteRecordsAsync(records);
                 await csvWriter.FlushAsync();
                 await streamWriter.FlushAsync();
-
+            
                 return response;
             }
             case "ascii_table":
@@ -93,6 +94,13 @@ public class RunQueryFunction
                 var table = AsciiTableFormatter.ToAsciiTable(records);
                 await response.WriteStringAsync(AsciiTableFormatter.WrapAsFragment(table));
 
+                return response;
+            }
+            case "html":
+            {
+                var response = req.CreateResponse(HttpStatusCode.OK);
+                response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+                await response.WriteStringAsync(HtmlTableFormatter.ToHtmlTable(records));
                 return response;
             }
             default:
