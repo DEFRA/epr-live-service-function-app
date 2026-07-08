@@ -1,9 +1,9 @@
 {
   "id": "organisation_details",
-  "displayName": "Organisations and associated Persons",
+  "displayName": "Organisations Details",
   "description": "For a given Reference Number, returns Organisation and associated Persons details",
   "target": "accounts", 
   "parameters": [
-    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "text", "required": true }
+    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "number", "required": true }
   ]
 }
