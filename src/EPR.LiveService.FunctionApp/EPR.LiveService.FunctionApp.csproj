@@ -21,4 +21,9 @@
     <PackageReference Include="Microsoft.Azure.Functions.Worker.Sdk" Version="2.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <EmbeddedResource Include="Queries\Definitions\*.json" />
+    <EmbeddedResource Include="Queries\Scripts\*.sql" />
+  </ItemGroup>
+
 </Project>

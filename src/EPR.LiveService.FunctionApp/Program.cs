@@ -1,7 +1,9 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
 using EPR.LiveService.FunctionApp;
+using EPR.LiveService.FunctionApp.Queries;
 using EPR.LiveService.FunctionApp.Repositories;
 using EPR.LiveService.FunctionApp.Repositories.Interfaces;
+using EPR.LiveService.FunctionApp.Sql;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.Configuration;
@@ -33,7 +35,15 @@ if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHT
 
 builder.Services.AddTransient<IOrganisationRepository, OrganisationRepository>();
 
-builder.Build().Run();
+builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
+    builder.Configuration.GetSection("SqlTargets"));
+
+builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
+
+var app = builder.Build();
+_ = app.Services.GetRequiredService<IQueryRegistry>();
+app.Run();
 
 
 
