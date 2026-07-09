@@ -54,6 +54,18 @@ public partial class QueryRegistryValidationTests
     }
 
     [TestMethod]
+    public async Task EveryDefinition_ShouldHaveAMatchingSqlScript()
+    {
+        foreach (var definition in _registry.All())
+        {
+            var act = async () => await _registry.LoadScriptAsync(definition.Id);
+    
+            await act.Should().NotThrowAsync<FileNotFoundException>(
+                $"query '{definition.Id}' has a definition but no matching .sql script file");
+        }
+    }
+
+    [TestMethod]
     public void EveryDefinition_ShouldHaveANonEmptyId()
     {
         foreach (var definition in _registry.All())

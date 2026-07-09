@@ -29,8 +29,6 @@ public class QueryRegistry : IQueryRegistry
                            && name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             .Select(LoadDefinition)
             .ToDictionary(d => d.Id, StringComparer.OrdinalIgnoreCase);
-
-        ValidateScriptsExist();
     }
 
     public QueryDefinition Get(string id) =>
@@ -64,24 +62,4 @@ public class QueryRegistry : IQueryRegistry
     private string BuildScriptResourceName(string queryId) =>
         $"{_assembly.GetName().Name}.{ScriptsResourceNamespace}.{queryId}.sql";
 
-    /// <summary>
-    /// Fails fast at startup, rather than on first request, if a definition is
-    /// missing its matching .sql file.
-    /// </summary>
-    private void ValidateScriptsExist()
-    {
-        var resourceNames = new HashSet<string>(
-            _assembly.GetManifestResourceNames(), StringComparer.Ordinal);
-
-        var missing = _definitions.Values
-            .Where(d => !resourceNames.Contains(BuildScriptResourceName(d.Id)))
-            .Select(d => d.Id)
-            .ToList();
-
-        if (missing.Count > 0)
-        {
-            throw new InvalidOperationException(
-                $"Missing .sql script(s) for query definition(s): {string.Join(", ", missing)}");
-        }
-    }
 }
