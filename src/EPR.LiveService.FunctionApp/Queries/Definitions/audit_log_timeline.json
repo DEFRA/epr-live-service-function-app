@@ -1,0 +1,9 @@
+{
+  "id": "audit_log_timeline",
+  "displayName": "Audit Log Timeline",
+  "description": "For a given Reference Number, returns a complete history of all entries in dbo.AuditLog",
+  "target": "accounts", 
+  "parameters": [
+    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "text", "required": true }
+  ]
+}

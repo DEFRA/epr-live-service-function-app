@@ -1,10 +1,10 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
-using Microsoft.Azure.Functions.Worker;
+using EPR.LiveService.FunctionApp.Queries;
+using EPR.LiveService.FunctionApp.Sql;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using OpenTelemetry;
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
@@ -17,4 +17,13 @@ if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHT
         .UseAzureMonitorExporter();
 }
 
-builder.Build().Run();
+builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
+    builder.Configuration.GetSection("SqlTargets"));
+
+builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
+
+var app = builder.Build();
+_ = app.Services.GetRequiredService<IQueryRegistry>();
+app.Run();
+
