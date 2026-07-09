@@ -143,6 +143,24 @@ public partial class QueryRegistryValidationTests
         }
     }
 
+    [TestMethod]
+    public void Get_WithUnknownId_ThrowsKeyNotFoundException()
+    {
+        var act = () => _registry.Get("does-not-exist");
+    
+        act.Should().Throw<KeyNotFoundException>()
+            .WithMessage("*does-not-exist*");
+    }
+
+    [TestMethod]
+    public async Task LoadScriptAsync_WithUnknownQueryId_ThrowsFileNotFoundException()
+    {
+        var act = async () => await _registry.LoadScriptAsync("does-not-exist");
+    
+        await act.Should().ThrowAsync<FileNotFoundException>()
+            .WithMessage("*not found for query*");
+    }
+
     /// <summary>
     /// Extracts SQL parameter placeholders (e.g. "ReferenceNumber" from "@ReferenceNumber"),
     /// excluding SQL Server system variables like @@ROWCOUNT.
