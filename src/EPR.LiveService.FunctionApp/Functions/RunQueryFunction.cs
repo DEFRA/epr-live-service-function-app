@@ -134,7 +134,7 @@ public class RunQueryFunction
             object typedValue = paramDef.Type switch
             {
                 "number" => decimal.Parse(raw),
-                "date" => DateTime.Parse(raw),
+                "date" => DateTime.Parse(raw, CultureInfo.InvariantCulture),
                 _ => raw
             };
 

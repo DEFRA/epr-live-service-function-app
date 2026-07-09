@@ -13,7 +13,7 @@ namespace EPR.LiveService.FunctionApp.UnitTests.Queries;
 /// so config mistakes (not logic bugs) are the most likely failure mode.
 /// </summary>
 [TestClass]
-public class QueryRegistryValidationTests
+public partial class QueryRegistryValidationTests
 {
     /// <summary>
     /// The set of SQL targets currently wired up in Program.cs. Kept here as an
@@ -147,9 +147,13 @@ public class QueryRegistryValidationTests
     /// Extracts SQL parameter placeholders (e.g. "ReferenceNumber" from "@ReferenceNumber"),
     /// excluding SQL Server system variables like @@ROWCOUNT.
     /// </summary>
+    [GeneratedRegex(@"(?<!@)@(\w+)")]
+    private static partial Regex SqlParameterRegex();
+
     private static HashSet<string> ExtractSqlParameterNames(string sql)
     {
-        var matches = Regex.Matches(sql, @"(?<!@)@(\w+)");
+        var matches = SqlParameterRegex().Matches(sql);
+
         return matches
             .Select(m => m.Groups[1].Value)
             .ToHashSet(StringComparer.OrdinalIgnoreCase);
