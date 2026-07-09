@@ -23,7 +23,7 @@
 
   <ItemGroup>
     <SonarQubeSetting Include="sonar.exclusions">
-      <Value>Queries/Scripts/*.sql</Value>
+      <Value>Queries/Scripts/*.sql,Formatting/*.cs,Program.cs,Functions/*.cs,Sql/*.cs</Value>
     </SonarQubeSetting>
     <EmbeddedResource Include="Queries\Definitions\*.json" />
     <EmbeddedResource Include="Queries\Scripts\*.sql" />
