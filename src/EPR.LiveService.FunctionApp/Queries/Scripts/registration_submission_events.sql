@@ -16,6 +16,6 @@ FROM rpd.Organisations org
   LEFT JOIN rpd.users us on us.userid= subEv.userid
 WHERE 
   org.ReferenceNumber = @ReferenceNumber
-  and sub.SubmissionPeriod LIKE '%@SubmissionYear'
+  and sub.SubmissionPeriod LIKE '%' + @SubmissionYear
   and sub.SubmissionType ='Registration'
 ORDER BY subEv.Created DESC
