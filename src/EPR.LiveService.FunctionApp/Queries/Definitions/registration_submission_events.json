@@ -1,0 +1,10 @@
+{
+  "id": "registration_submission_events",
+  "displayName": "Registration Submission Events",
+  "description": "Returns registration submission events for a given Organisation Reference Number",
+  "target": "synapse", 
+  "parameters": [
+    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "text", "required": true },
+    { "name": "SubmissionYear", "label": "SubmissionYear", "type": "text", "required": true }
+  ]
+}

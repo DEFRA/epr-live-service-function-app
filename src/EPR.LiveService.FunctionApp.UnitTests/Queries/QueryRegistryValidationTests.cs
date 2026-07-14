@@ -26,6 +26,7 @@ public partial class QueryRegistryValidationTests
     private static readonly HashSet<string> KnownTargets = new(StringComparer.OrdinalIgnoreCase)
     {
         "accounts",
+        "synapse"
     };
 
     private static readonly HashSet<string> AllowedParameterTypes = new(StringComparer.OrdinalIgnoreCase)
