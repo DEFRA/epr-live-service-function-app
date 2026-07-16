@@ -1,0 +1,26 @@
+{{ if rows.size == 0 }}
+<p>(no rows)</p>
+{{ else }}
+<div id="query-results-list" class="query-results-list">
+    <div class="table-scroll">
+        <table>
+            <thead>
+                <tr>
+                    {{ for column in columns }}
+                    <th class="sort" data-sort="{{ column | html.escape }}">{{ column | html.escape }}</th>
+                    {{ end }}
+                </tr>
+            </thead>
+            <tbody class="list">
+                {{ for row in rows }}
+                <tr>
+                    {{ for cell in row.cells }}
+                    <td class="{{ cell.column | html.escape }}">{{ cell.value | html.escape }}</td>
+                    {{ end }}
+                </tr>
+                {{ end }}
+            </tbody>
+        </table>
+    </div>
+</div>
+{{ end }}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Available Queries</title>
+    <style>
+{{ include "Styles.sbn" }}
+    </style>
+</head>
+<body class="narrow">
+    <h1>Available Queries</h1>
+    <ul class="query-list">
+        {{ for definition in definitions }}
+        <li>
+            <a href="/api/query/{{ definition.id | html.url_encode | html.escape }}">{{ definition.display_name | html.escape }}</a>
+            <p class="muted">{{ definition.description | html.escape }}</p>
+        </li>
+        {{ end }}
+    </ul>
+</body>
+</html>
