@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ display_name | html.escape }}</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/list.js/2.3.1/list.min.js"></script>
+    <style>
+{{ include "Styles.sbn" }}
+    </style>
+</head>
+<body>
+    <h1>{{ display_name | html.escape }}</h1>
+    <p>{{ description | html.escape }}</p>
+
+    <form id="query-form">
+        {{ for parameter in parameters }}
+        <label for="{{ parameter.name | html.escape }}">{{ parameter.label | html.escape }}</label>
+        <input type="{{ parameter.input_type | html.escape }}" id="{{ parameter.name | html.escape }}" name="{{ parameter.name | html.escape }}"{{ if parameter.required }} required{{ end }} />
+        {{ end }}
+
+        <fieldset>
+            <legend>Output format</legend>
+            <label class="radio-option">
+                <input type="radio" name="output" value="html" checked />
+                HTML Table
+                <span class="option-hint">- sortable by column</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="output" value="ascii_table" />
+                ASCII Table
+                <span class="option-hint">- good for copy-pasting, nicely formatted</span>
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="output" value="csv" />
+                CSV
+                <span class="option-hint">- best for large result sets</span>
+            </label>
+        </fieldset>
+
+        <button type="submit">Run query</button>
+    </form>
+
+    <div id="results"></div>
+
+    <script>
+        const queryId = {{ query_id_json }};
+
+        document.getElementById('query-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const params = new URLSearchParams(new FormData(e.target));
+            const url = `/api/query/${queryId}/results?${params.toString()}`;
+
+            if (params.get('output') === 'csv') {
+                window.location.href = url;
+                return;
+            }
+
+            const resultsDiv = document.getElementById('results');
+            resultsDiv.innerHTML = '<p>Running...</p>';
+
+            try {
+                const res = await fetch(url);
+                const html = await res.text();
+                if (!res.ok) {
+                    resultsDiv.innerHTML = `<p class="error">${html}</p>`;
+                    return;
+                }
+                resultsDiv.innerHTML = html;
+
+                const container = document.getElementById('query-results-list');
+                if (container) {
+                    const valueNames = Array.from(container.querySelectorAll('th[data-sort]'))
+                        .map(th => th.dataset.sort);
+                    new List('query-results-list', { valueNames });
+                }
+            } catch (err) {
+                resultsDiv.innerHTML = `<p class="error">${err.message}</p>`;
+            }
+        });
+    </script>
+</body>
+</html>

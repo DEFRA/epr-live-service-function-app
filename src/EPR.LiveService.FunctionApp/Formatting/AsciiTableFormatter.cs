@@ -1,4 +1,3 @@
-using System.Net;
 using System.Text;
 
 namespace EPR.LiveService.FunctionApp.Formatting;
@@ -30,5 +29,5 @@ public static class AsciiTableFormatter
     }
 
     public static string WrapAsFragment(string asciiTable) =>
-        $"<pre>{WebUtility.HtmlEncode(asciiTable)}</pre>";
+        TemplateRenderer.Render("AsciiFragment.sbn", new { AsciiTable = asciiTable }).TrimEnd();
 }
