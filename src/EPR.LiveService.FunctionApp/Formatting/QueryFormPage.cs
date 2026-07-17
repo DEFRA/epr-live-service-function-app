@@ -9,6 +9,16 @@ public static class QueryFormPage
     {
         ArgumentNullException.ThrowIfNull(definition);
 
+        var outputs = definition.Outputs
+            .Select((format, index) => new
+            {
+                Key = format.Key(),
+                DisplayName = format.DisplayName(),
+                Hint = format.Hint(),
+                Checked = index == 0
+            })
+            .ToArray();
+
         var model = new
         {
             definition.Id,
@@ -26,7 +36,10 @@ public static class QueryFormPage
                     "date" => "date",
                     _ => "text"
                 }
-            }).ToArray()
+            }).ToArray(),
+            Outputs = outputs,
+            ShowOutputPicker = outputs.Length > 1,
+            DefaultOutput = outputs.Length > 0 ? outputs[0].Key : QueryOutputFormat.Csv.Key()
         };
 
         return TemplateRenderer.Render("QueryForm.sbn", model);

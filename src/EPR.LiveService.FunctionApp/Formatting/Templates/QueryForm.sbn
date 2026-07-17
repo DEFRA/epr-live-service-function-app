@@ -19,24 +19,20 @@
         <input type="{{ parameter.input_type | html.escape }}" id="{{ parameter.name | html.escape }}" name="{{ parameter.name | html.escape }}"{{ if parameter.required }} required{{ end }} />
         {{ end }}
 
+        {{ if show_output_picker }}
         <fieldset>
             <legend>Output format</legend>
+            {{ for output in outputs }}
             <label class="radio-option">
-                <input type="radio" name="output" value="html" checked />
-                HTML Table
-                <span class="option-hint">- sortable by column</span>
+                <input type="radio" name="output" value="{{ output.key | html.escape }}"{{ if output.checked }} checked{{ end }}/>
+                {{ output.display_name | html.escape }}
+                <span class="option-hint">- {{ output.hint | html.escape }}</span>
             </label>
-            <label class="radio-option">
-                <input type="radio" name="output" value="ascii_table" />
-                ASCII Table
-                <span class="option-hint">- good for copy-pasting, nicely formatted</span>
-            </label>
-            <label class="radio-option">
-                <input type="radio" name="output" value="csv" />
-                CSV
-                <span class="option-hint">- best for large result sets</span>
-            </label>
+            {{ end }}
         </fieldset>
+        {{ else }}
+        <input type="hidden" name="output" value="{{ default_output | html.escape }}" />
+        {{ end }}
 
         <button type="submit">Run query</button>
     </form>
