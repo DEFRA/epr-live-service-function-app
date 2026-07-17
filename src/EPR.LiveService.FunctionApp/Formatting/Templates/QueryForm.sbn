@@ -9,6 +9,7 @@
     </style>
 </head>
 <body>
+    <a class="back-link" href="/api/queries">&larr; Back to all queries</a>
     <h1>{{ display_name | html.escape }}</h1>
     <p>{{ description | html.escape }}</p>
 
