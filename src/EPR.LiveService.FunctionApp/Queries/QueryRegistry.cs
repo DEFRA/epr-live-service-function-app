@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Text.Json;
+using EPR.LiveService.FunctionApp.Formatting;
 
 namespace EPR.LiveService.FunctionApp.Queries;
 
@@ -16,7 +17,8 @@ public class QueryRegistry : IQueryRegistry
 
     private static readonly JsonSerializerOptions DeserializationOptions = new()
     {
-        PropertyNameCaseInsensitive = true
+        PropertyNameCaseInsensitive = true,
+        Converters = { new QueryOutputFormatJsonConverter() }
     };
 
     private readonly Assembly _assembly = typeof(QueryRegistry).Assembly;

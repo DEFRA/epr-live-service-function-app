@@ -1,12 +1,12 @@
 using System.Globalization;
 using System.Net;
-using CsvHelper;
 using Dapper;
 using EPR.LiveService.FunctionApp.Formatting;
 using EPR.LiveService.FunctionApp.Queries;
 using EPR.LiveService.FunctionApp.Sql;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EPR.LiveService.FunctionApp.Functions;
 
@@ -14,11 +14,16 @@ public class RunQueryFunction
 {
     private readonly IQueryRegistry _registry;
     private readonly ISqlConnectionFactory _connectionFactory;
+    private readonly IServiceProvider _serviceProvider;
 
-    public RunQueryFunction(IQueryRegistry registry, ISqlConnectionFactory connectionFactory)
+    public RunQueryFunction(
+        IQueryRegistry registry,
+        ISqlConnectionFactory connectionFactory,
+        IServiceProvider serviceProvider)
     {
         _registry = registry;
         _connectionFactory = connectionFactory;
+        _serviceProvider = serviceProvider;
     }
 
     [Function("RunQuery")]
@@ -50,10 +55,17 @@ public class RunQueryFunction
             return badRequest;
         }
 
-        var output = req.Query.Get("output");
-        if (string.IsNullOrWhiteSpace(output))
+        var outputKey = req.Query.Get("output");
+        if (string.IsNullOrWhiteSpace(outputKey))
         {
-            output = "ascii_table";
+            outputKey = QueryOutputFormat.AsciiTable.Key();
+        }
+
+        if (!QueryOutputFormatDisplay.TryParseKey(outputKey, out var output))
+        {
+            var badOutput = req.CreateResponse(HttpStatusCode.BadRequest);
+            await badOutput.WriteStringAsync($"Unknown option: {outputKey}");
+            return badOutput;
         }
 
         using var connection = await _connectionFactory.CreateConnectionAsync(definition.Target);
@@ -69,47 +81,14 @@ public class RunQueryFunction
             return noContent;
         }
 
-        switch (output)
-        {
-            case "csv":
-            {
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "text/csv; charset=utf-8");
-                response.Headers.Add("Content-Disposition", $"attachment; filename=\"{queryId}.csv\"");
-            
-                await using var streamWriter = new StreamWriter(response.Body, leaveOpen: true);
-                await using var csvWriter = new CsvWriter(streamWriter, CultureInfo.InvariantCulture);
-            
-                await csvWriter.WriteRecordsAsync(records);
-                await csvWriter.FlushAsync();
-                await streamWriter.FlushAsync();
-            
-                return response;
-            }
-            case "ascii_table":
-            {
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+        // Resolved eagerly for every QueryOutputFormat at startup in Program.cs,
+        // so a missing formatter here would already have failed the app before
+        // this request could ever arrive.
+        var formatter = _serviceProvider.GetRequiredKeyedService<IQueryResultFormatter>(output);
 
-                var table = AsciiTableFormatter.ToAsciiTable(records);
-                await response.WriteStringAsync(AsciiTableFormatter.WrapAsFragment(table));
-
-                return response;
-            }
-            case "html":
-            {
-                var response = req.CreateResponse(HttpStatusCode.OK);
-                response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-                await response.WriteStringAsync(HtmlTableFormatter.ToHtmlTable(records));
-                return response;
-            }
-            default:
-            {
-                var badRequest = req.CreateResponse(HttpStatusCode.BadRequest);
-                await badRequest.WriteStringAsync($"Unknown option: {output}");
-                return badRequest;
-            }
-        }
+        var response = req.CreateResponse(HttpStatusCode.OK);
+        await formatter.WriteAsync(response, queryId, records);
+        return response;
     }
 
     private static DynamicParameters BuildParameters(QueryDefinition definition, System.Collections.Specialized.NameValueCollection query)

@@ -1,6 +1,10 @@
+using System.Net;
+using System.Text;
+using Microsoft.Azure.Functions.Worker.Http;
+
 namespace EPR.LiveService.FunctionApp.Formatting;
 
-public static class HtmlTableFormatter
+public class HtmlTableFormatter : IQueryResultFormatter
 {
     public static string ToHtmlTable(IEnumerable<dynamic> rows)
     {
@@ -23,5 +27,11 @@ public static class HtmlTableFormatter
         };
 
         return TemplateRenderer.Render("HtmlTable.sbn", model);
+    }
+
+    public async Task WriteAsync(HttpResponseData response, string queryId, IEnumerable<dynamic> records)
+    {
+        response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+        await response.WriteStringAsync(ToHtmlTable(records));
     }
 }

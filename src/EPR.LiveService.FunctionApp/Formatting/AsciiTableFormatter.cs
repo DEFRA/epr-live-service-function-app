@@ -1,8 +1,10 @@
+using System.Net;
 using System.Text;
+using Microsoft.Azure.Functions.Worker.Http;
 
 namespace EPR.LiveService.FunctionApp.Formatting;
 
-public static class AsciiTableFormatter
+public class AsciiTableFormatter : IQueryResultFormatter
 {
     public static string ToAsciiTable(IEnumerable<dynamic> rows)
     {
@@ -30,4 +32,10 @@ public static class AsciiTableFormatter
 
     public static string WrapAsFragment(string asciiTable) =>
         TemplateRenderer.Render("AsciiFragment.sbn", new { AsciiTable = asciiTable }).TrimEnd();
+
+    public async Task WriteAsync(HttpResponseData response, string queryId, IEnumerable<dynamic> records)
+    {
+        response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+        await response.WriteStringAsync(WrapAsFragment(ToAsciiTable(records)));
+    }
 }

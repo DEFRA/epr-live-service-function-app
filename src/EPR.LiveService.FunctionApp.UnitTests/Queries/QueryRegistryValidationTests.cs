@@ -116,6 +116,22 @@ public partial class QueryRegistryValidationTests
     }
 
     [TestMethod]
+    public void EveryDefinition_ShouldDeclareAtLeastOneOutput()
+    {
+        foreach (var definition in _registry.All())
+        {
+            definition.Outputs.Should().NotBeEmpty(
+                $"query '{definition.Id}' must declare at least one output, or the form has " +
+                "nothing to submit as the 'output' value");
+        }
+    }
+
+    // No "every output should be a known format" test here: Outputs is a
+    // List<QueryOutputFormat>, so an invalid value in a .json definition
+    // (e.g. "pdf") fails QueryOutputFormatJsonConverter deserialization when
+    // QueryRegistry is constructed in Setup() above, before any test body runs.
+
+    [TestMethod]
     public async Task EveryScript_ShouldOnlyReferencePlaceholdersDeclaredInItsDefinition()
     {
         foreach (var definition in _registry.All())
