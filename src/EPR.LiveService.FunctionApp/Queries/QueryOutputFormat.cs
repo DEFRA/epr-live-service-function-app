@@ -15,5 +15,8 @@ public enum QueryOutputFormat
     AsciiTable,
 
     [QueryOutputFormatMetadata("csv", "CSV", "best for large result sets")]
-    Csv
+    Csv,
+
+    [QueryOutputFormatMetadata("list", "Simple report", "labelled fields for a single result")]
+    List
 }

@@ -30,6 +30,7 @@ builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
 builder.Services.AddKeyedSingleton<IQueryResultFormatter, HtmlTableFormatter>(QueryOutputFormat.Html);
 builder.Services.AddKeyedSingleton<IQueryResultFormatter, AsciiTableFormatter>(QueryOutputFormat.AsciiTable);
 builder.Services.AddKeyedSingleton<IQueryResultFormatter, CsvFormatter>(QueryOutputFormat.Csv);
+builder.Services.AddKeyedSingleton<IQueryResultFormatter, ListFormatter>(QueryOutputFormat.List);
 
 var app = builder.Build();
 _ = app.Services.GetRequiredService<IQueryRegistry>();

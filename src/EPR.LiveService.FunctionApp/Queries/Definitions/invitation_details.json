@@ -1,0 +1,10 @@
+{
+  "id": "invitation_details",
+  "displayName": "Invitation Details",
+  "description": "For a given email address, returns invitation, inviter, organisation, role and enrolment details",
+  "target": "accounts",
+  "parameters": [
+    { "name": "Email", "label": "Email address", "type": "text", "required": true }
+  ],
+  "outputs": ["list"]
+}
