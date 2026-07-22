@@ -1,0 +1,58 @@
+using System.Net;
+using EPR.LiveService.FunctionApp.Formatting;
+using EPR.LiveService.FunctionApp.Notifications;
+using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Http;
+
+namespace EPR.LiveService.FunctionApp.Functions;
+
+public class ResendEprPackagingFunction(IEmailNotificationSender sender)
+{
+    public const string TemplateId = "958280bf-e77e-4940-ba37-74340c02e44d";
+
+    [Function("ResendEprPackagingForm")]
+    public static async Task<HttpResponseData> ShowForm(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "resend-epr-packaging")] HttpRequestData req)
+    {
+        var response = req.CreateResponse(HttpStatusCode.OK);
+        response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+        await response.WriteStringAsync(ResendEprPackagingPage.Build());
+        return response;
+    }
+
+    [Function("ResendEprPackaging")]
+    public async Task<HttpResponseData> Send(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resend-epr-packaging")] HttpRequestData req)
+    {
+        var request = await req.ReadFromJsonAsync<ResendEprPackagingRequest>();
+        if (request is null)
+        {
+            return await WriteJsonAsync(
+                req.CreateResponse(HttpStatusCode.BadRequest),
+                new { error = "A JSON request body is required." });
+        }
+
+        var errors = request.Validate();
+        if (errors.Count > 0)
+        {
+            return await WriteJsonAsync(
+                req.CreateResponse(HttpStatusCode.BadRequest),
+                new { errors });
+        }
+
+        await sender.SendAsync(
+            request.EmailAddress!,
+            TemplateId,
+            request.ToPersonalisation());
+
+        return await WriteJsonAsync(
+            req.CreateResponse(HttpStatusCode.OK),
+            new { message = $"Email sent to {request.EmailAddress}." });
+    }
+
+    private static async Task<HttpResponseData> WriteJsonAsync(HttpResponseData response, object value)
+    {
+        await response.WriteAsJsonAsync(value);
+        return response;
+    }
+}

@@ -1,7 +1,9 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
 using EPR.LiveService.FunctionApp.Formatting;
+using EPR.LiveService.FunctionApp.Features;
 using EPR.LiveService.FunctionApp.Queries;
 using EPR.LiveService.FunctionApp.Sql;
+using EPR.LiveService.FunctionApp.Notifications;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +25,8 @@ builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
 
 builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
+builder.Services.AddSingleton<IFeatureRegistry, FeatureRegistry>();
+builder.Services.AddSingleton<IEmailNotificationSender, GovUkNotifyEmailSender>();
 
 // The enum-to-formatter map: every QueryOutputFormat needs an entry here.
 // RunQueryFunction resolves the right one via GetRequiredKeyedService rather

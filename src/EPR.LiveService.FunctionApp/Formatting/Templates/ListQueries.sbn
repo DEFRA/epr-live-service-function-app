@@ -10,6 +10,12 @@
 <body class="narrow">
     <h1>Available Queries</h1>
     <ul class="query-list">
+        {{ for feature in features }}
+        <li>
+            <a href="{{ feature.path | html.escape }}">{{ feature.display_name | html.escape }}</a>
+            <p class="muted">{{ feature.description | html.escape }}</p>
+        </li>
+        {{ end }}
         {{ for definition in definitions }}
         <li>
             <a href="/api/query/{{ definition.id | html.url_encode | html.escape }}">{{ definition.display_name | html.escape }}</a>
