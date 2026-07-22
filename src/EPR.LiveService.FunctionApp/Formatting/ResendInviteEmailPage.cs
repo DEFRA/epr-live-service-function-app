@@ -1,8 +1,8 @@
 namespace EPR.LiveService.FunctionApp.Formatting;
 
-public static class ResendEprPackagingPage
+public static class ResendInviteEmailPage
 {
     public static string Build() => TemplateRenderer.Render(
-        "ResendEprPackaging.sbn",
+        "ResendInviteEmail.sbn",
         new { });
 }

@@ -48,7 +48,7 @@ public class ResendEprPackagingTests
     [TestMethod]
     public void Form_ShouldCollectEveryRequiredParameter()
     {
-        var html = ResendEprPackagingPage.Build();
+        var html = ResendInviteEmailPage.Build();
 
         html.Should().Contain("Re-send Extended Producer Responsibility for Packaging");
         html.Should().Contain("name=\"EmailAddress\" required");

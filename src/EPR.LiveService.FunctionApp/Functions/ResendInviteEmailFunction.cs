@@ -16,7 +16,7 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-        await response.WriteStringAsync(ResendEprPackagingPage.Build());
+        await response.WriteStringAsync(ResendInviteEmailPage.Build());
         return response;
     }
 
