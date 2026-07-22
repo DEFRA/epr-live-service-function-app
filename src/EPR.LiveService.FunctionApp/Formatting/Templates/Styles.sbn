@@ -158,6 +158,17 @@ button {
     background: #333333;
 }
 
+.report-actions {
+    margin-top: 1.25rem;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 1px solid #4ea1f3;
+    border-radius: 4px;
+}
+
 .table-scroll {
     overflow-x: auto;
     max-width: 100%;

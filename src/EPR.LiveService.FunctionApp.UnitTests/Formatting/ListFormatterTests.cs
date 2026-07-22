@@ -54,6 +54,21 @@ public class ListFormatterTests
     }
 
     [TestMethod]
+    public void ToHtmlList_ShouldRenderGenericResultActions()
+    {
+        dynamic row = new ExpandoObject();
+        row.Name = "Joe";
+
+        var html = ListFormatter.ToHtmlList(
+            new[] { row },
+            [new QueryResultAction("Re-send invitation", "/api/resend?FirstName=Joe%20Bloggs")]);
+
+        html.Should().Contain("class=\"button-link\"");
+        html.Should().Contain("Re-send invitation");
+        html.Should().Contain("href=\"/api/resend?FirstName=Joe%20Bloggs\"");
+    }
+
+    [TestMethod]
     public void ToHtmlList_ShouldEscapeLabelsAndValues()
     {
         dynamic row = new ExpandoObject();

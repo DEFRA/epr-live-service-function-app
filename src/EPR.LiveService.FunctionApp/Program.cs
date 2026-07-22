@@ -25,6 +25,7 @@ builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
 builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
 builder.Services.AddSingleton<IEmailNotificationSender, GovUkNotifyEmailSender>();
+builder.Services.AddSingleton<IQueryResultActionProvider, ResendInvitateEmailActionProvider>();
 
 // The enum-to-formatter map: every QueryOutputFormat needs an entry here.
 // RunQueryFunction resolves the right one via GetRequiredKeyedService rather

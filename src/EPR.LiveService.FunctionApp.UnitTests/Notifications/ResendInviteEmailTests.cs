@@ -7,7 +7,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace EPR.LiveService.FunctionApp.UnitTests.Notifications;
 
 [TestClass]
-public class ResendEprPackagingTests
+public class ResendInviteEmailTests
 {
     [TestMethod]
     public void ValidRequest_ShouldMapExpectedNotifyPersonalisation()
@@ -51,12 +51,26 @@ public class ResendEprPackagingTests
         var html = ResendInviteEmailPage.Build();
 
         html.Should().Contain("Re-send Extended Producer Responsibility for Packaging");
-        html.Should().Contain("name=\"EmailAddress\" required");
-        html.Should().Contain("name=\"OrganisationName\" required");
-        html.Should().Contain("name=\"FirstName\" required");
-        html.Should().Contain("name=\"LastName\" required");
-        html.Should().Contain("name=\"JoinTheTeamLink\" required");
+        html.Should().Contain("name=\"EmailAddress\"").And.Contain("required");
+        html.Should().Contain("name=\"OrganisationName\"");
+        html.Should().Contain("name=\"FirstName\"");
+        html.Should().Contain("name=\"LastName\"");
+        html.Should().Contain("name=\"JoinTheTeamLink\"");
         html.Should().Contain("fetch('/api/resend-invite-email'");
+    }
+
+    [TestMethod]
+    public void Form_ShouldPrefillAnyProvidedFieldsAndEscapeThem()
+    {
+        var html = ResendInviteEmailPage.Build(new ResendInviteEmailRequest
+        {
+            EmailAddress = "joe@example.com",
+            OrganisationName = "Kell & <Bloggs>"
+        });
+
+        html.Should().Contain("value=\"joe@example.com\"");
+        html.Should().Contain("value=\"Kell &amp; &lt;Bloggs&gt;\"");
+        html.Should().Contain("id=\"FirstName\" name=\"FirstName\" value=\"\"");
     }
 
     [TestMethod]

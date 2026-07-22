@@ -16,7 +16,14 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-        await response.WriteStringAsync(ResendInviteEmailPage.Build());
+        await response.WriteStringAsync(ResendInviteEmailPage.Build(new ResendInviteEmailRequest
+        {
+            EmailAddress = req.Query.Get(nameof(ResendInviteEmailRequest.EmailAddress)),
+            OrganisationName = req.Query.Get(nameof(ResendInviteEmailRequest.OrganisationName)),
+            FirstName = req.Query.Get(nameof(ResendInviteEmailRequest.FirstName)),
+            LastName = req.Query.Get(nameof(ResendInviteEmailRequest.LastName)),
+            JoinTheTeamLink = req.Query.Get(nameof(ResendInviteEmailRequest.JoinTheTeamLink))
+        }));
         return response;
     }
 

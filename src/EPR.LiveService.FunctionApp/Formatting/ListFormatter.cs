@@ -9,6 +9,8 @@ namespace EPR.LiveService.FunctionApp.Formatting;
 /// </summary>
 public partial class ListFormatter : IQueryResultFormatter
 {
+    private readonly IEnumerable<IQueryResultActionProvider> _actionProviders;
+
     private static readonly IReadOnlyDictionary<string, string> FriendlyLabels =
         new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
         {
@@ -16,7 +18,14 @@ public partial class ListFormatter : IQueryResultFormatter
             ["OrgRef"] = "Organisation ID"
         };
 
-    public static string ToHtmlList(IEnumerable<dynamic> records)
+    public ListFormatter(IEnumerable<IQueryResultActionProvider> actionProviders)
+    {
+        _actionProviders = actionProviders;
+    }
+
+    public static string ToHtmlList(
+        IEnumerable<dynamic> records,
+        IEnumerable<QueryResultAction>? actions = null)
     {
         ArgumentNullException.ThrowIfNull(records);
 
@@ -43,13 +52,22 @@ public partial class ListFormatter : IQueryResultFormatter
             };
         }).ToArray();
 
-        return TemplateRenderer.Render("List.sbn", new { Fields = fields });
+        return TemplateRenderer.Render("List.sbn", new
+        {
+            Fields = fields,
+            Actions = actions?.ToArray() ?? []
+        });
     }
 
     public async Task WriteAsync(HttpResponseData response, string queryId, IEnumerable<dynamic> records)
     {
+        var rows = records.ToList();
+        var record = rows.Cast<IDictionary<string, object>>().Single()
+            .ToDictionary(field => field.Key, field => field.Value);
+        var actions = _actionProviders.SelectMany(provider => provider.GetActions(queryId, record));
+
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-        await response.WriteStringAsync(ToHtmlList(records));
+        await response.WriteStringAsync(ToHtmlList(rows, actions));
     }
 
     private static string ToDisplayLabel(string name)

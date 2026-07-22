@@ -22,3 +22,10 @@
     </div>
     {{ end }}
 </dl>
+{{ if actions.size > 0 }}
+<div class="report-actions">
+    {{ for action in actions }}
+    <a class="button-link" href="{{ action.url | html.escape }}">{{ action.label | html.escape }}</a>
+    {{ end }}
+</div>
+{{ end }}

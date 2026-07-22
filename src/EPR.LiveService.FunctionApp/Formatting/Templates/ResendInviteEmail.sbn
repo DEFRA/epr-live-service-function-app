@@ -13,19 +13,19 @@
 
     <form id="resend-form">
         <label for="EmailAddress">Email address</label>
-        <input type="email" id="EmailAddress" name="EmailAddress" required />
+        <input type="email" id="EmailAddress" name="EmailAddress" value="{{ email_address | html.escape }}" required />
 
         <label for="OrganisationName">Organisation name</label>
-        <input type="text" id="OrganisationName" name="OrganisationName" required />
+        <input type="text" id="OrganisationName" name="OrganisationName" value="{{ organisation_name | html.escape }}" required />
 
         <label for="FirstName">First name</label>
-        <input type="text" id="FirstName" name="FirstName" required />
+        <input type="text" id="FirstName" name="FirstName" value="{{ first_name | html.escape }}" required />
 
         <label for="LastName">Last name</label>
-        <input type="text" id="LastName" name="LastName" required />
+        <input type="text" id="LastName" name="LastName" value="{{ last_name | html.escape }}" required />
 
         <label for="JoinTheTeamLink">Join the team link</label>
-        <input type="url" id="JoinTheTeamLink" name="JoinTheTeamLink" required />
+        <input type="url" id="JoinTheTeamLink" name="JoinTheTeamLink" value="{{ join_the_team_link | html.escape }}" required />
 
         <button type="submit">Re-send email</button>
     </form>
