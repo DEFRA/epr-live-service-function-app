@@ -10,12 +10,10 @@
 <body class="narrow">
     <h1>Available Queries</h1>
     <ul class="query-list">
-        {{ for feature in features }}
         <li>
-            <a href="{{ feature.path | html.escape }}">{{ feature.display_name | html.escape }}</a>
-            <p class="muted">{{ feature.description | html.escape }}</p>
+            <a href="/api/resend-invite-email">Re-send Extended Producer Responsibility for Packaging Email</a>
+            <p class="muted">Send the EPR packaging invitation email again using GOV.UK Notify.</p>
         </li>
-        {{ end }}
         {{ for definition in definitions }}
         <li>
             <a href="/api/query/{{ definition.id | html.url_encode | html.escape }}">{{ definition.display_name | html.escape }}</a>

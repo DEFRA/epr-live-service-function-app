@@ -54,6 +54,18 @@ public class TemplateRenderingTests
     }
 
     [TestMethod]
+    public void ListQueries_ShouldRenderResendEprPackagingFeature()
+    {
+        var html = TemplateRenderer.Render(
+            "ListQueries.sbn",
+            new { Definitions = Array.Empty<QueryDefinition>() });
+
+        html.Should().Contain("href=\"/api/resend-invite-email\"");
+        html.Should().Contain("Re-send Extended Producer Responsibility for Packaging Email");
+        html.Should().Contain("Send the EPR packaging invitation email again using GOV.UK Notify.");
+    }
+
+    [TestMethod]
     public void QueryFormPage_WithMultipleOutputs_ShouldRenderRadioButtonsInDeclaredOrder()
     {
         var definition = new QueryDefinition

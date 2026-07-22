@@ -1,6 +1,0 @@
-{
-  "id": "resend_epr_packaging",
-  "displayName": "Re-send Extended Producer Responsibility for Packaging Email",
-  "description": "Send the EPR packaging invitation email again using GOV.UK Notify.",
-  "path": "/api/resend-epr-packaging"
-}

@@ -28,7 +28,7 @@ public class ResendEprPackagingTests
     [TestMethod]
     public void InvalidRequest_ShouldReportMissingAndMalformedValues()
     {
-        var request = new ResendEprPackagingRequest
+        var request = new ResendInviteEmailRequest
         {
             EmailAddress = "not-an-email",
             OrganisationName = " ",
@@ -56,17 +56,17 @@ public class ResendEprPackagingTests
         html.Should().Contain("name=\"FirstName\" required");
         html.Should().Contain("name=\"LastName\" required");
         html.Should().Contain("name=\"JoinTheTeamLink\" required");
-        html.Should().Contain("fetch('/api/resend-epr-packaging'");
+        html.Should().Contain("fetch('/api/resend-invite-email'");
     }
 
     [TestMethod]
     public void Feature_ShouldUseProvidedTemplateId()
     {
-        ResendEprPackagingFunction.TemplateId.Should()
+        ResendInviteEmailFunction.TemplateId.Should()
             .Be("958280bf-e77e-4940-ba37-74340c02e44d");
     }
 
-    private static ResendEprPackagingRequest ValidRequest() => new()
+    private static ResendInviteEmailRequest ValidRequest() => new()
     {
         EmailAddress = "joe.bloggs@example.com",
         OrganisationName = "Kellbloggs",

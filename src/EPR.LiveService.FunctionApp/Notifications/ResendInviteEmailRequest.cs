@@ -2,7 +2,7 @@ using System.Net.Mail;
 
 namespace EPR.LiveService.FunctionApp.Notifications;
 
-public class ResendEprPackagingRequest
+public class ResendInviteEmailRequest
 {
     public string? EmailAddress { get; set; }
 

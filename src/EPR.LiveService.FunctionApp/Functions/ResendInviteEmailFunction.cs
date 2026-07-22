@@ -6,13 +6,13 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace EPR.LiveService.FunctionApp.Functions;
 
-public class ResendEprPackagingFunction(IEmailNotificationSender sender)
+public class ResendInviteEmailFunction(IEmailNotificationSender sender)
 {
     public const string TemplateId = "958280bf-e77e-4940-ba37-74340c02e44d";
 
-    [Function("ResendEprPackagingForm")]
+    [Function("ResendInviteForm")]
     public static async Task<HttpResponseData> ShowForm(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "resend-epr-packaging")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "resend-invite-email")] HttpRequestData req)
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
@@ -20,11 +20,11 @@ public class ResendEprPackagingFunction(IEmailNotificationSender sender)
         return response;
     }
 
-    [Function("ResendEprPackaging")]
+    [Function("ResendInvite")]
     public async Task<HttpResponseData> Send(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resend-epr-packaging")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resend-invite-email")] HttpRequestData req)
     {
-        var request = await req.ReadFromJsonAsync<ResendEprPackagingRequest>();
+        var request = await req.ReadFromJsonAsync<ResendInviteEmailRequest>();
         if (request is null)
         {
             return await WriteJsonAsync(

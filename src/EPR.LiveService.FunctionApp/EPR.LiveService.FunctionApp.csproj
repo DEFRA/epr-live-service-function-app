@@ -30,7 +30,6 @@
     </SonarQubeSetting>
     <EmbeddedResource Include="Queries\Definitions\*.json" />
     <EmbeddedResource Include="Queries\Scripts\*.sql" />
-    <EmbeddedResource Include="Features\Definitions\*.json" />
     <EmbeddedResource Include="Formatting\Templates\*.sbn" />
   </ItemGroup>
 

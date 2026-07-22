@@ -45,7 +45,7 @@
             status.textContent = 'Sending...';
 
             try {
-                const response = await fetch('/api/resend-epr-packaging', {
+                const response = await fetch('/api/resend-invite-email', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
