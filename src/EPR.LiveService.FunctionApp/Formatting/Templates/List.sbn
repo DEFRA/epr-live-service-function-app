@@ -1,0 +1,31 @@
+<dl class="report-list">
+    {{ for field in fields }}
+    <div class="report-field">
+        <dt>{{ field.label | html.escape }}:</dt>
+        <dd>
+            <span class="report-value">{{ if field.is_link }}<a href="{{ field.value | html.escape }}">{{ field.value | html.escape }}</a>{{ else }}{{ field.value | html.escape }}{{ end }}</span>
+            {{ if field.is_copyable }}
+            <button
+                type="button"
+                class="copy-field-button"
+                data-copy-value="{{ field.value | html.escape }}"
+                title="Copy {{ field.label | html.escape }}"
+                aria-label="Copy {{ field.label | html.escape }}"
+                onclick="navigator.clipboard.writeText(this.dataset.copyValue)">
+                <svg aria-hidden="true" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="11" height="11" rx="2"></rect>
+                    <path d="M15 9V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h3"></path>
+                </svg>
+            </button>
+            {{ end }}
+        </dd>
+    </div>
+    {{ end }}
+</dl>
+{{ if actions.size > 0 }}
+<div class="report-actions">
+    {{ for action in actions }}
+    <a class="button-link" href="{{ action.url | html.escape }}">{{ action.label | html.escape }}</a>
+    {{ end }}
+</div>
+{{ end }}

@@ -10,6 +10,10 @@
 <body class="narrow">
     <h1>Available Queries</h1>
     <ul class="query-list">
+        <li>
+            <a href="/api/resend-invite-email">Re-send Invitation Email</a>
+            <p class="muted">Send the invitation email again using GOV.UK Notify.</p>
+        </li>
         {{ for definition in definitions }}
         <li>
             <a href="/api/query/{{ definition.id | html.url_encode | html.escape }}">{{ definition.display_name | html.escape }}</a>

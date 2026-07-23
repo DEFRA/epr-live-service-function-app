@@ -59,7 +59,9 @@ label {
 
 input[type="text"],
 input[type="number"],
-input[type="date"] {
+input[type="date"],
+input[type="email"],
+input[type="url"] {
     width: 100%;
     padding: 0.4rem;
     margin-top: 0.25rem;
@@ -108,6 +110,63 @@ button {
 
 .query-results-list {
     margin-top: 1rem;
+}
+
+.report-list {
+    margin-top: 1rem;
+}
+
+.report-field {
+    display: grid;
+    grid-template-columns: minmax(12rem, 1fr) 2fr;
+    gap: 1rem;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid #3a3a3a;
+}
+
+.report-field dt {
+    font-weight: 600;
+}
+
+.report-field dd {
+    margin: 0;
+    overflow-wrap: anywhere;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+}
+
+.report-value {
+    flex: 1;
+}
+
+.copy-field-button {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+    padding: 0.2rem;
+    border: 1px solid #666666;
+    border-radius: 4px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+}
+
+.copy-field-button:hover {
+    background: #333333;
+}
+
+.report-actions {
+    margin-top: 1.25rem;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    border: 1px solid #4ea1f3;
+    border-radius: 4px;
 }
 
 .table-scroll {

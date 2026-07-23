@@ -24,7 +24,13 @@ public class QueryDefinition
     /// The output formats this query supports. Drives which radio buttons the
     /// query form renders — if only one is declared, the form skips the radio
     /// group entirely and submits that format as a hidden field. Defaults to
-    /// every known format when omitted from the .json definition
+    /// the standard multi-row formats when omitted from the .json definition.
+    /// Single-row formats such as List must be explicitly selected.
     /// </summary>
-    public List<QueryOutputFormat> Outputs { get; set; } = [.. Enum.GetValues<QueryOutputFormat>()];
+    public List<QueryOutputFormat> Outputs { get; set; } =
+    [
+        QueryOutputFormat.Html,
+        QueryOutputFormat.AsciiTable,
+        QueryOutputFormat.Csv
+    ];
 }

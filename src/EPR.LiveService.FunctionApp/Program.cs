@@ -2,6 +2,7 @@ using Azure.Monitor.OpenTelemetry.Exporter;
 using EPR.LiveService.FunctionApp.Formatting;
 using EPR.LiveService.FunctionApp.Queries;
 using EPR.LiveService.FunctionApp.Sql;
+using EPR.LiveService.FunctionApp.Notifications;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
@@ -23,6 +24,8 @@ builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
 
 builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
+builder.Services.AddSingleton<IEmailNotificationSender, GovUkNotifyEmailSender>();
+builder.Services.AddSingleton<IQueryResultActionProvider, ResendInvitateEmailActionProvider>();
 
 // The enum-to-formatter map: every QueryOutputFormat needs an entry here.
 // RunQueryFunction resolves the right one via GetRequiredKeyedService rather
@@ -30,6 +33,7 @@ builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
 builder.Services.AddKeyedSingleton<IQueryResultFormatter, HtmlTableFormatter>(QueryOutputFormat.Html);
 builder.Services.AddKeyedSingleton<IQueryResultFormatter, AsciiTableFormatter>(QueryOutputFormat.AsciiTable);
 builder.Services.AddKeyedSingleton<IQueryResultFormatter, CsvFormatter>(QueryOutputFormat.Csv);
+builder.Services.AddKeyedSingleton<IQueryResultFormatter, ListFormatter>(QueryOutputFormat.List);
 
 var app = builder.Build();
 _ = app.Services.GetRequiredService<IQueryRegistry>();
