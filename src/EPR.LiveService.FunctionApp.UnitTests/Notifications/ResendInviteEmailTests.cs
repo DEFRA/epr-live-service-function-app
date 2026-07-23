@@ -50,7 +50,7 @@ public class ResendInviteEmailTests
     {
         var html = ResendInviteEmailPage.Build();
 
-        html.Should().Contain("Re-send Extended Producer Responsibility for Packaging");
+        html.Should().Contain("Re-send Invitation Email");
         html.Should().Contain("name=\"EmailAddress\"").And.Contain("required");
         html.Should().Contain("name=\"OrganisationName\"");
         html.Should().Contain("name=\"FirstName\"");
