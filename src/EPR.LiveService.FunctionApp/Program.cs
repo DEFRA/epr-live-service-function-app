@@ -1,8 +1,9 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
 using EPR.LiveService.FunctionApp.Formatting;
+using EPR.LiveService.FunctionApp.Middleware;
+using EPR.LiveService.FunctionApp.Notifications;
 using EPR.LiveService.FunctionApp.Queries;
 using EPR.LiveService.FunctionApp.Sql;
-using EPR.LiveService.FunctionApp.Notifications;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ using Microsoft.Extensions.Hosting;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
+builder.UseMiddleware<AuthClaimsLoggingMiddleware>();
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
 {
