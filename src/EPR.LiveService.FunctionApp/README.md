@@ -2,7 +2,7 @@
 
 ## GOV.UK Notify configuration
 
-The **Re-send Extended Producer Responsibility for Packaging** feature uses
+The **Re-send Invitation Email** feature uses
 template `958280bf-e77e-4940-ba37-74340c02e44d` and requires the following
 configuration setting:
 

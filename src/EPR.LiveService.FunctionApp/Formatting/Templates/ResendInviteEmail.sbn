@@ -2,14 +2,14 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Re-send Extended Producer Responsibility for Packaging</title>
+    <title>Re-send Invitation Email</title>
     <style>
 {{ include "Styles.sbn" }}
     </style>
 </head>
 <body class="narrow">
     <a class="back-link" href="/api/queries">&larr; Back to all queries</a>
-    <h1>Re-send Extended Producer Responsibility for Packaging</h1>
+    <h1>Re-send Invitation Email</h1>
 
     <form id="resend-form">
         <label for="EmailAddress">Email address</label>

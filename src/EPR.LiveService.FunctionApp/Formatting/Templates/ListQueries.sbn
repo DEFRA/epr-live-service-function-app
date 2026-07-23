@@ -11,8 +11,8 @@
     <h1>Available Queries</h1>
     <ul class="query-list">
         <li>
-            <a href="/api/resend-invite-email">Re-send Extended Producer Responsibility for Packaging Email</a>
-            <p class="muted">Send the EPR packaging invitation email again using GOV.UK Notify.</p>
+            <a href="/api/resend-invite-email">Re-send Invitation Email</a>
+            <p class="muted">Send the invitation email again using GOV.UK Notify.</p>
         </li>
         {{ for definition in definitions }}
         <li>

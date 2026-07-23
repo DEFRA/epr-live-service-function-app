@@ -61,8 +61,8 @@ public class TemplateRenderingTests
             new { Definitions = Array.Empty<QueryDefinition>() });
 
         html.Should().Contain("href=\"/api/resend-invite-email\"");
-        html.Should().Contain("Re-send Extended Producer Responsibility for Packaging Email");
-        html.Should().Contain("Send the EPR packaging invitation email again using GOV.UK Notify.");
+        html.Should().Contain("Re-send Invitation Email");
+        html.Should().Contain("Send the invitation email again using GOV.UK Notify.");
     }
 
     [TestMethod]
