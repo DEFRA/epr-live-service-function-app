@@ -1,8 +1,10 @@
 using Notify.Client;
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.LiveService.FunctionApp.Notifications;
 
+[ExcludeFromCodeCoverage]
 public class GovUkNotifyEmailSender : IEmailNotificationSender
 {
     private readonly string? _apiKey;
