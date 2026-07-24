@@ -13,4 +13,3 @@ GovUkNotify__ApiKey=<GOV.UK Notify API key>
 Use this double-underscore key both as a deployed environment variable and under
 `Values` in `local.settings.json` for local development. .NET configuration maps
 the double underscore to `GovUkNotify:ApiKey`.
-
