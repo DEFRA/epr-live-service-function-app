@@ -24,7 +24,7 @@ public sealed class AuthClaimsLoggingMiddleware(
                 ClientPrincipalHeader,
                 out var clientPrincipalHeaders);
 
-            if (hasClientPrincipal && clientPrincipalHeaders is not null)
+            if (hasClientPrincipal)
             {
                 LogClientPrincipalClaims(clientPrincipalHeaders.FirstOrDefault());
             }
