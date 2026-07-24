@@ -25,6 +25,7 @@ builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
     builder.Configuration.GetSection("SqlTargets"));
 
 builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
+builder.Services.AddSingleton<IClientPrincipalDecoder, ClientPrincipalDecoder>();
 builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
 builder.Services.AddSingleton<IEmailNotificationSender, GovUkNotifyEmailSender>();
 builder.Services.AddSingleton<IQueryResultActionProvider, ResendInvitateEmailActionProvider>();
