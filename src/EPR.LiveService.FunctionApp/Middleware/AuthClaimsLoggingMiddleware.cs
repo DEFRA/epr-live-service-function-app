@@ -26,11 +26,11 @@ public sealed class AuthClaimsLoggingMiddleware(
 
             if (hasClientPrincipal)
             {
-                LogClientPrincipalClaims(clientPrincipalHeaders.FirstOrDefault());
+                LogClientPrincipalClaims(clientPrincipalHeaders?.FirstOrDefault());
             }
             else if (request.Headers.TryGetValues("Authorization", out var authorizationHeaders))
             {
-                LogJwtClaims(authorizationHeaders.FirstOrDefault());
+                LogJwtClaims(authorizationHeaders?.FirstOrDefault());
             }
         }
 
@@ -44,6 +44,11 @@ public sealed class AuthClaimsLoggingMiddleware(
             logger.LogWarning(
                 "The request {ClientPrincipalHeader} header could not be decoded.",
                 ClientPrincipalHeader);
+            return;
+        }
+
+        if (!logger.IsEnabled(LogLevel.Information))
+        {
             return;
         }
 
