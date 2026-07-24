@@ -24,13 +24,18 @@ public sealed class AuthClaimsLoggingMiddleware(
                 ClientPrincipalHeader,
                 out var clientPrincipalHeaders);
 
+            if(clientPrincipalHeaders is null)
+            {
+                return;
+            }
+
             if (hasClientPrincipal)
             {
-                LogClientPrincipalClaims(clientPrincipalHeaders?.FirstOrDefault());
+                LogClientPrincipalClaims(clientPrincipalHeaders.FirstOrDefault());
             }
             else if (request.Headers.TryGetValues("Authorization", out var authorizationHeaders))
             {
-                LogJwtClaims(authorizationHeaders?.FirstOrDefault());
+                LogJwtClaims(authorizationHeaders.FirstOrDefault());
             }
         }
 
