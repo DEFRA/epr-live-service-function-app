@@ -24,7 +24,7 @@ public sealed class AuthClaimsLoggingMiddleware(
                 ClientPrincipalHeader,
                 out var clientPrincipalHeaders);
 
-            if(clientPrincipalHeaders is null)
+            if (clientPrincipalHeaders is null)
             {
                 return;
             }
