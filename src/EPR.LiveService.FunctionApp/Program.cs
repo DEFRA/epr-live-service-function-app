@@ -12,6 +12,14 @@ using Microsoft.Extensions.Hosting;
 var builder = FunctionsApplication.CreateBuilder(args);
 
 builder.ConfigureFunctionsWebApplication();
+
+if (builder.Environment.IsDevelopment())
+{
+    // Azure App Service Easy Auth supplies this header in hosted environments.
+    // Simulate it when running locally so authenticated endpoints behave the same way.
+    builder.UseMiddleware<LocalClientPrincipalMiddleware>();
+}
+
 builder.UseMiddleware<AuthClaimsLoggingMiddleware>();
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
