@@ -1,7 +1,9 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 
 namespace EPR.LiveService.FunctionApp.Extentions;
 
+[ExcludeFromCodeCoverage]
 public static class ClaimsPrincipalExtensions
 {
     public static string? GetTenantId(

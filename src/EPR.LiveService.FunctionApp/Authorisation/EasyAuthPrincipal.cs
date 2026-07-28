@@ -1,4 +1,5 @@
 using Microsoft.Azure.Functions.Worker.Http;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
@@ -6,6 +7,7 @@ using System.Text.Json.Serialization;
 
 namespace EPR.LiveService.FunctionApp.Authorisation;
 
+[ExcludeFromCodeCoverage]
 public static class EasyAuthPrincipal
 {
     public static ClaimsPrincipal? Parse(HttpRequestData request)
