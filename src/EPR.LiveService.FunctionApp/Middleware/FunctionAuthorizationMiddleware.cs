@@ -2,11 +2,13 @@ using EPR.LiveService.FunctionApp.Authorisation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Reflection;
 
 namespace EPR.LiveService.FunctionApp.Middleware;
 
+[ExcludeFromCodeCoverage]
 public sealed class FunctionAuthorizationMiddleware : IFunctionsWorkerMiddleware
 {
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
