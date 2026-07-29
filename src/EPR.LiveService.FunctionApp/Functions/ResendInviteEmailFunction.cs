@@ -11,6 +11,8 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     public const string TemplateId = "958280bf-e77e-4940-ba37-74340c02e44d";
 
     [Function("ResendInviteForm")]
+    [AuthorizeFunction(
+        Roles.Admin)]
     public static async Task<HttpResponseData> ShowForm(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "resend-invite-email")] HttpRequestData req)
     {
@@ -28,6 +30,8 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     }
 
     [Function("ResendInvite")]
+    [AuthorizeFunction(
+        Roles.Admin)]
     public async Task<HttpResponseData> Send(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resend-invite-email")] HttpRequestData req)
     {

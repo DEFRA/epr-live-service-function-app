@@ -13,6 +13,9 @@ public class ListQueriesFunction
     public ListQueriesFunction(IQueryRegistry registry) => _registry = registry;
 
     [Function("ListQueries")]
+    [AuthorizeFunction(
+        Roles.User,
+        Roles.Admin)]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "queries")] HttpRequestData req)
     {
