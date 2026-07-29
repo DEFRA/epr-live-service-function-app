@@ -59,11 +59,13 @@ public sealed class FunctionAuthorizationMiddleware : IFunctionsWorkerMiddleware
 
         var typeName = entryPoint[..methodSeparator];
         var methodName = entryPoint[(methodSeparator + 1)..];
-        var assembly = Assembly.LoadFrom(context.FunctionDefinition.PathToAssembly);
-        var method = assembly.GetType(typeName)?.GetMethod(
-            methodName,
-            BindingFlags.Public | BindingFlags.NonPublic |
-            BindingFlags.Instance | BindingFlags.Static);
+        var method = typeof(FunctionAuthorizationMiddleware).Assembly
+            .GetType(typeName)?
+            .GetMethod(
+                methodName,
+                BindingFlags.Public |
+                BindingFlags.Instance |
+                BindingFlags.Static);
 
         return method?.GetCustomAttribute<AuthorizeFunctionAttribute>();
     }
