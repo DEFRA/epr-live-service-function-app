@@ -27,6 +27,9 @@ public class RunQueryFunction
     }
 
     [Function("RunQuery")]
+    [AuthorizeFunction(
+        Roles.User,
+        Roles.Admin)]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "query/{queryId}/results")] HttpRequestData req,
         string queryId)

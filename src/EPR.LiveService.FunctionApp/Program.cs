@@ -20,6 +20,7 @@ if (builder.Environment.IsDevelopment())
     builder.UseMiddleware<LocalClientPrincipalMiddleware>();
 }
 
+builder.UseMiddleware<FunctionAuthorizationMiddleware>();
 builder.UseMiddleware<AuthClaimsLoggingMiddleware>();
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
