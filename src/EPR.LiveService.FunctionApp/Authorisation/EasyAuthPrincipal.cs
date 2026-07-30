@@ -4,13 +4,16 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using Microsoft.Extensions.Logging;
 
 namespace EPR.LiveService.FunctionApp.Authorisation;
 
 [ExcludeFromCodeCoverage]
 public static class EasyAuthPrincipal
 {
-    public static ClaimsPrincipal? Parse(HttpRequestData request)
+    public static ClaimsPrincipal? Parse(
+        HttpRequestData request,
+        ILogger? logger = null)
     {
         if (!request.Headers.TryGetValues(
                 "X-MS-CLIENT-PRINCIPAL",
@@ -23,6 +26,8 @@ public static class EasyAuthPrincipal
 
         if (string.IsNullOrWhiteSpace(encodedPrincipal))
         {
+            logger?.LogWarning(
+                "The X-MS-CLIENT-PRINCIPAL header was present but empty.");
             return null;
         }
 
@@ -38,6 +43,8 @@ public static class EasyAuthPrincipal
 
             if (clientPrincipal?.Claims is null)
             {
+                logger?.LogWarning(
+                    "The X-MS-CLIENT-PRINCIPAL header did not contain any claims.");
                 return null;
             }
 
@@ -55,12 +62,18 @@ public static class EasyAuthPrincipal
 
             return new ClaimsPrincipal(identity);
         }
-        catch (FormatException)
+        catch (FormatException exception)
         {
+            logger?.LogWarning(
+                exception,
+                "The X-MS-CLIENT-PRINCIPAL header was not valid Base64.");
             return null;
         }
-        catch (JsonException)
+        catch (JsonException exception)
         {
+            logger?.LogWarning(
+                exception,
+                "The X-MS-CLIENT-PRINCIPAL header did not contain valid JSON.");
             return null;
         }
     }
