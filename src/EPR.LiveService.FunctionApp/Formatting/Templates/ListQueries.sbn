@@ -14,6 +14,10 @@
             <a href="/api/resend-invite-email">Re-send Invitation Email</a>
             <p class="muted">Send the invitation email again using GOV.UK Notify.</p>
         </li>
+        <li>
+            <a href="/api/pending-change-details">Pending Change Details</a>
+            <p class="muted">Get regulator identifiers and the latest pending change history identifier.</p>
+        </li>
         {{ for definition in definitions }}
         <li>
             <a href="/api/query/{{ definition.id | html.url_encode | html.escape }}">{{ definition.display_name | html.escape }}</a>
