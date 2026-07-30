@@ -30,12 +30,21 @@ public static class QueryFormPage
                 param.Name,
                 param.Label,
                 param.Required,
+                IsSelect = param.Type == "select",
                 InputType = param.Type switch
                 {
                     "number" => "number",
                     "date" => "date",
                     _ => "text"
-                }
+                },
+                Options = param.Type == "select"
+                    ? param.Options?.Select((option, index) => new
+                    {
+                        option.Value,
+                        option.Label,
+                        Checked = index == 0
+                    }).ToArray()
+                    : null
             }).ToArray(),
             Outputs = outputs,
             ShowOutputPicker = outputs.Length > 1,

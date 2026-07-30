@@ -15,8 +15,20 @@
 
     <form id="query-form">
         {{ for parameter in parameters }}
+        {{ if parameter.is_select }}
+        <fieldset>
+            <legend>{{ parameter.label | html.escape }}</legend>
+            {{ for option in parameter.options }}
+            <label class="radio-option">
+                <input type="radio" name="{{ parameter.name | html.escape }}" value="{{ option.value | html.escape }}"{{ if option.checked }} checked{{ end }} />
+                {{ option.label | html.escape }}
+            </label>
+            {{ end }}
+        </fieldset>
+        {{ else }}
         <label for="{{ parameter.name | html.escape }}">{{ parameter.label | html.escape }}</label>
         <input type="{{ parameter.input_type | html.escape }}" id="{{ parameter.name | html.escape }}" name="{{ parameter.name | html.escape }}"{{ if parameter.required }} required{{ end }} />
+        {{ end }}
         {{ end }}
 
         {{ if show_output_picker }}

@@ -1,0 +1,20 @@
+{
+  "id": "user_lookup",
+  "displayName": "User Lookup by Email",
+  "description": "Finds the UserId for a given email address, matching exactly or as a substring",
+  "target": "accounts",
+  "parameters": [
+    { "name": "Email", "label": "Email", "type": "text", "required": true },
+    {
+      "name": "MatchType",
+      "label": "Match type",
+      "type": "select",
+      "required": true,
+      "options": [
+        { "value": "equals", "label": "Equals" },
+        { "value": "contains", "label": "Contains" }
+      ]
+    }
+  ],
+  "outputs": ["ascii_table"]
+}

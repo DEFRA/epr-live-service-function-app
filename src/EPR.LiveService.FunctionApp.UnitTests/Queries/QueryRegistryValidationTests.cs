@@ -34,6 +34,7 @@ public partial class QueryRegistryValidationTests
         "text",
         "number",
         "date",
+        "select",
     };
 
     private QueryRegistry _registry = null!;
@@ -111,6 +112,21 @@ public partial class QueryRegistryValidationTests
             {
                 parameter.Label.Should().NotBeNullOrWhiteSpace(
                     $"query '{definition.Id}' parameter '{parameter.Name}' needs a label for the generated form");
+            }
+        }
+    }
+
+    [TestMethod]
+    public void EverySelectParameter_ShouldHaveAtLeastTwoOptions()
+    {
+        foreach (var definition in _registry.All())
+        {
+            foreach (var parameter in definition.Parameters.Where(p => p.Type == "select"))
+            {
+                parameter.Options.Should().NotBeNullOrEmpty(
+                    $"query '{definition.Id}' parameter '{parameter.Name}' is type 'select' but has no options");
+                parameter.Options!.Count.Should().BeGreaterThanOrEqualTo(2,
+                    $"query '{definition.Id}' parameter '{parameter.Name}' should offer at least two choices");
             }
         }
     }
