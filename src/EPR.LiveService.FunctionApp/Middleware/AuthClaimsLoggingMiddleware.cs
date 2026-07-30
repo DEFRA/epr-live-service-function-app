@@ -24,8 +24,10 @@ public sealed class AuthClaimsLoggingMiddleware(
                 ClientPrincipalHeader,
                 out var clientPrincipalHeaders);
 
-            if(clientPrincipalHeaders is null)
+            if (clientPrincipalHeaders is null)
             {
+                logger?.LogWarning(
+                        "The X-MS-CLIENT-PRINCIPAL header was not provided.");
                 return;
             }
 

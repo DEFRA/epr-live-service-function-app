@@ -13,6 +13,9 @@ public class QueryFormFunction
     public QueryFormFunction(IQueryRegistry registry) => _registry = registry;
 
     [Function("QueryForm")]
+    [AuthorizeFunction(
+        Roles.User,
+        Roles.Admin)]
     public async Task<HttpResponseData> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "query/{queryId}")] HttpRequestData req,
         string queryId)
