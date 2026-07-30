@@ -2,6 +2,7 @@ using EPR.LiveService.FunctionApp.Authorisation;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
+using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Reflection;
@@ -9,7 +10,8 @@ using System.Reflection;
 namespace EPR.LiveService.FunctionApp.Middleware;
 
 [ExcludeFromCodeCoverage]
-public sealed class FunctionAuthorizationMiddleware : IFunctionsWorkerMiddleware
+public sealed class FunctionAuthorizationMiddleware(
+    ILogger<FunctionAuthorizationMiddleware> logger) : IFunctionsWorkerMiddleware
 {
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
@@ -29,19 +31,30 @@ public sealed class FunctionAuthorizationMiddleware : IFunctionsWorkerMiddleware
             return;
         }
 
-        var principal = EasyAuthPrincipal.Parse(request);
+        var principal = EasyAuthPrincipal.Parse(request, logger);
 
         if (principal?.Identity?.IsAuthenticated != true)
         {
+            logger.LogWarning(
+                "Unauthenticated request rejected for function {FunctionName}.",
+                context.FunctionDefinition.Name);
+
             context.GetInvocationResult().Value =
                 request.CreateResponse(HttpStatusCode.Unauthorized);
+
             return;
         }
 
         if (!attribute.IsAuthorized(principal))
         {
+            logger.LogWarning(
+                "Request rejected because its tenant, object identifier, or roles " +
+                "do not satisfy the authorization requirements for function {FunctionName}.",
+                context.FunctionDefinition.Name);
+
             context.GetInvocationResult().Value =
                 request.CreateResponse(HttpStatusCode.Forbidden);
+
             return;
         }
 
