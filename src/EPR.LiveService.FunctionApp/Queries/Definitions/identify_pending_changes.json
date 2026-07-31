@@ -1,0 +1,20 @@
+{
+  "id": "identify_pending_changes",
+  "displayName": "Identify Pending Changes",
+  "description": "Returns pending change history for active organisations and users",
+  "target": "accounts",
+  "parameters": [
+    {
+      "name": "NationId",
+      "label": "Nation ID",
+      "type": "number",
+      "required": false
+    },
+    {
+      "name": "DeclarationCutOffDate",
+      "label": "Declaration Cut Off Date",
+      "type": "date",
+      "required": false
+    }
+  ]
+}
