@@ -17,9 +17,10 @@ FROM
         ON poc.PersonId = ch.PersonId
         AND poc.OrganisationId = ch.OrganisationId
 WHERE
-    (@NationId IS NULL OR o.NationId = @NationId)
-    AND (@DeclarationCutOffDate IS NULL
-        OR ch.DeclarationDate >= @DeclarationCutOffDate)
+    (NULLIF(LTRIM(RTRIM(CONVERT(VARCHAR(50), @NationId))), '') IS NULL
+        OR o.NationId = TRY_CONVERT(INT, @NationId))
+    AND (NULLIF(LTRIM(RTRIM(CONVERT(VARCHAR(50), @DeclarationCutOffDate))), '') IS NULL
+        OR ch.DeclarationDate >= TRY_CONVERT(DATE, @DeclarationCutOffDate))
     AND ch.DecisionDate IS NULL
     AND poc.IsDeleted = 0
     AND o.IsDeleted = 0
