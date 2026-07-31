@@ -8,13 +8,13 @@
       "name": "NationId",
       "label": "Nation ID",
       "type": "number",
-      "required": true
+      "required": false
     },
     {
       "name": "DeclarationCutOffDate",
       "label": "Declaration Cut Off Date",
       "type": "date",
-      "required": true
+      "required": false
     }
   ]
 }

@@ -17,8 +17,9 @@ FROM
         ON poc.PersonId = ch.PersonId
         AND poc.OrganisationId = ch.OrganisationId
 WHERE
-    o.NationId = @NationId
-    AND ch.DeclarationDate >= @DeclarationCutOffDate
+    (@NationId IS NULL OR o.NationId = @NationId)
+    AND (@DeclarationCutOffDate IS NULL
+        OR ch.DeclarationDate >= @DeclarationCutOffDate)
     AND ch.DecisionDate IS NULL
     AND poc.IsDeleted = 0
     AND o.IsDeleted = 0
