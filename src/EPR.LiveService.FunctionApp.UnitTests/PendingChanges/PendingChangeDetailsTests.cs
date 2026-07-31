@@ -22,14 +22,29 @@ public class PendingChangeDetailsTests
             BearerToken = null,
             RegulatorEmail = "not-an-email",
             UserEmail = null,
-            UserOrganisationId = " "
+            UserOrganisationId = " ",
+            RegulatorResponse = "Deferred"
         };
 
         request.Validate().Should().BeEquivalentTo(
             "BearerToken is required.",
             "UserEmail is required.",
             "UserOrganisationId is required.",
-            "RegulatorEmail must be a valid email address.");
+            "RegulatorEmail must be a valid email address.",
+            "RegulatorResponse must be either Accepted or Rejected.");
+    }
+
+    [TestMethod]
+    public void RejectedRequest_ShouldRequireRegulatorComments()
+    {
+        var request = ValidRequest();
+        request.RegulatorResponse = "Rejected";
+
+        request.Validate().Should().ContainSingle()
+            .Which.Should().Be("RegulatorComments is required when RegulatorResponse is Rejected.");
+
+        request.RegulatorComments = "The evidence was insufficient.";
+        request.Validate().Should().BeEmpty();
     }
 
     [TestMethod]
@@ -43,6 +58,9 @@ public class PendingChangeDetailsTests
         html.Should().Contain("name=\"RegulatorEmail\"").And.Contain("required");
         html.Should().Contain("name=\"UserEmail\"");
         html.Should().Contain("name=\"UserOrganisationId\"");
+        html.Should().Contain("name=\"RegulatorResponse\" value=\"Accepted\"");
+        html.Should().Contain("name=\"RegulatorResponse\" value=\"Rejected\"");
+        html.Should().Contain("name=\"RegulatorComments\"");
         html.Should().Contain("fetch('/api/pending-change-details'");
     }
 
@@ -53,12 +71,16 @@ public class PendingChangeDetailsTests
         {
             BearerToken = "token<&>",
             RegulatorEmail = "regulator@example.com",
-            UserOrganisationId = "ORG<&>"
+            UserOrganisationId = "ORG<&>",
+            RegulatorResponse = "Rejected",
+            RegulatorComments = "Reason <&>"
         });
 
         html.Should().Contain("value=\"token&lt;&amp;&gt;\"");
         html.Should().Contain("value=\"regulator@example.com\"");
         html.Should().Contain("value=\"ORG&lt;&amp;&gt;\"");
+        html.Should().Contain("value=\"Rejected\" checked");
+        html.Should().Contain("Reason &lt;&amp;&gt;");
         html.Should().Contain("id=\"UserEmail\" name=\"UserEmail\" value=\"\"");
     }
 
@@ -67,6 +89,7 @@ public class PendingChangeDetailsTests
         BearerToken = "test-token",
         RegulatorEmail = "regulator@example.com",
         UserEmail = "user@example.com",
-        UserOrganisationId = "123456"
+        UserOrganisationId = "123456",
+        RegulatorResponse = "Accepted"
     };
 }

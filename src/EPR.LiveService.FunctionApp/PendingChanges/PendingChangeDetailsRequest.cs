@@ -12,6 +12,10 @@ public class PendingChangeDetailsRequest
 
     public string? UserOrganisationId { get; set; }
 
+    public string? RegulatorResponse { get; set; }
+
+    public string? RegulatorComments { get; set; }
+
     public IReadOnlyList<string> Validate()
     {
         var errors = new List<string>();
@@ -20,8 +24,22 @@ public class PendingChangeDetailsRequest
         AddRequiredError(errors, RegulatorEmail, nameof(RegulatorEmail));
         AddRequiredError(errors, UserEmail, nameof(UserEmail));
         AddRequiredError(errors, UserOrganisationId, nameof(UserOrganisationId));
+        AddRequiredError(errors, RegulatorResponse, nameof(RegulatorResponse));
         AddEmailError(errors, RegulatorEmail, nameof(RegulatorEmail));
         AddEmailError(errors, UserEmail, nameof(UserEmail));
+
+        if (!string.IsNullOrWhiteSpace(RegulatorResponse)
+            && !RegulatorResponse.Equals("Accepted", StringComparison.OrdinalIgnoreCase)
+            && !RegulatorResponse.Equals("Rejected", StringComparison.OrdinalIgnoreCase))
+        {
+            errors.Add("RegulatorResponse must be either Accepted or Rejected.");
+        }
+
+        if (RegulatorResponse?.Equals("Rejected", StringComparison.OrdinalIgnoreCase) == true
+            && string.IsNullOrWhiteSpace(RegulatorComments))
+        {
+            errors.Add("RegulatorComments is required when RegulatorResponse is Rejected.");
+        }
 
         return errors;
     }

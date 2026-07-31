@@ -21,6 +21,23 @@
         <label for="UserOrganisationId">User organisation ID</label>
         <input type="text" id="UserOrganisationId" name="UserOrganisationId" value="{{ user_organisation_id | html.escape }}" required />
 
+        <fieldset>
+            <legend>Regulator response</legend>
+            <label class="radio-option">
+                <input type="radio" name="RegulatorResponse" value="Accepted"{{ if accepted }} checked{{ end }} required />
+                Accepted
+            </label>
+            <label class="radio-option">
+                <input type="radio" name="RegulatorResponse" value="Rejected"{{ if rejected }} checked{{ end }} required />
+                Rejected
+            </label>
+        </fieldset>
+
+        <div id="regulator-comments-container"{{ if !rejected }} hidden{{ end }}>
+            <label for="RegulatorComments">Regulator comments</label>
+            <textarea id="RegulatorComments" name="RegulatorComments" rows="5"{{ if rejected }} required{{ end }}>{{ regulator_comments | html.escape }}</textarea>
+        </div>
+
         <label for="BearerToken">Bearer token</label>
         <input type="password" id="BearerToken" name="BearerToken" value="{{ bearer_token | html.escape }}" autocomplete="off" required />
 
@@ -38,6 +55,23 @@
     </dl>
 
     <script>
+        const responseInputs = document.querySelectorAll('input[name="RegulatorResponse"]');
+        const commentsContainer = document.getElementById('regulator-comments-container');
+        const commentsInput = document.getElementById('RegulatorComments');
+
+        function updateRegulatorComments() {
+            const response = document.querySelector('input[name="RegulatorResponse"]:checked')?.value;
+            const rejected = response === 'Rejected';
+            commentsContainer.hidden = !rejected;
+            commentsInput.required = rejected;
+
+            if (!rejected) {
+                commentsInput.value = '';
+            }
+        }
+
+        responseInputs.forEach(input => input.addEventListener('change', updateRegulatorComments));
+
         document.getElementById('pending-change-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const form = event.target;

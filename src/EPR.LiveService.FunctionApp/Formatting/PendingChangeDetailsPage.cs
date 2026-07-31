@@ -11,6 +11,9 @@ public static class PendingChangeDetailsPage
             BearerToken = values?.BearerToken ?? string.Empty,
             RegulatorEmail = values?.RegulatorEmail ?? string.Empty,
             UserEmail = values?.UserEmail ?? string.Empty,
-            UserOrganisationId = values?.UserOrganisationId ?? string.Empty
+            UserOrganisationId = values?.UserOrganisationId ?? string.Empty,
+            Accepted = values?.RegulatorResponse?.Equals("Accepted", StringComparison.OrdinalIgnoreCase) == true,
+            Rejected = values?.RegulatorResponse?.Equals("Rejected", StringComparison.OrdinalIgnoreCase) == true,
+            RegulatorComments = values?.RegulatorComments ?? string.Empty
         });
 }
