@@ -2,14 +2,17 @@ using System.Net;
 using Dapper;
 using EPR.LiveService.FunctionApp.Formatting;
 using EPR.LiveService.FunctionApp.PendingChanges;
+using EPR.LiveService.FunctionApp.Services;
 using EPR.LiveService.FunctionApp.Sql;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 
 namespace EPR.LiveService.FunctionApp.Functions;
 
-public class PendingChangeDetailsFunction(ISqlConnectionFactory connectionFactory)
-{
+public class PendingChangeDetailsFunction(
+    ISqlConnectionFactory connectionFactory,
+    IOrganisationService organisationService)
+    {
     [Function("PendingChangeDetailsForm")]
     [AuthorizeFunction(Roles.Admin)]
     public static async Task<HttpResponseData> ShowForm(
@@ -26,20 +29,21 @@ public class PendingChangeDetailsFunction(ISqlConnectionFactory connectionFactor
         return response;
     }
 
-    [Function("GetPendingChangeDetails")]
+    [Function("UpdatePendingChangeDetails")]
     [AuthorizeFunction(Roles.Admin)]
     public async Task<HttpResponseData> RunQuery(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "pending-change-details")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-pending-change-details")]
+            HttpRequestData req, CancellationToken cancellationToken)
     {
-        var request = await req.ReadFromJsonAsync<PendingChangeDetailsRequest>();
-        if (request is null)
+        var pendingChangeDetailsRequest = await req.ReadFromJsonAsync<PendingChangeDetailsRequest>();
+        if (pendingChangeDetailsRequest is null)
         {
             return await WriteJsonAsync(
                 req.CreateResponse(HttpStatusCode.BadRequest),
                 new { error = "A JSON request body is required." });
         }
 
-        var errors = request.Validate();
+        var errors = pendingChangeDetailsRequest.Validate();
         if (errors.Count > 0)
         {
             return await WriteJsonAsync(
@@ -91,16 +95,33 @@ public class PendingChangeDetailsFunction(ISqlConnectionFactory connectionFactor
             """;
 
         using var connection = await connectionFactory.CreateConnectionAsync("accounts");
-        var result = await connection.QueryFirstOrDefaultAsync<PendingChangeDetailsResult>(regulatorDetailsSql, request);
+        var pendingChangeRegulatorDetails = await connection.QueryFirstOrDefaultAsync<PendingChangeRegulatorDetails>(regulatorDetailsSql, pendingChangeDetailsRequest);
 
-        if (result is null)
+        if (pendingChangeRegulatorDetails is null)
         {
             return await WriteJsonAsync(
                 req.CreateResponse(HttpStatusCode.NotFound),
                 new { error = "No matching regulator or pending change history was found." });
         }
 
-        return await WriteJsonAsync(req.CreateResponse(HttpStatusCode.OK), result);
+        var updateOrganisationResult = await organisationService.UpdateOrganisationAsync(
+            pendingChangeRegulatorDetails,
+            pendingChangeDetailsRequest.RegulatorResponse!.Equals(
+                "Accepted",
+                StringComparison.OrdinalIgnoreCase),
+            pendingChangeDetailsRequest.RegulatorComments ?? string.Empty,
+            pendingChangeDetailsRequest.BearerToken!,
+            cancellationToken);
+
+        return await WriteJsonAsync(
+            req.CreateResponse(HttpStatusCode.OK),
+            new
+            {
+                pendingChangeRegulatorDetails.XEprUser,
+                pendingChangeRegulatorDetails.XEprOrganisation,
+                pendingChangeRegulatorDetails.ChangeHistoryExternalId,
+                UpdateOrganisationResult = updateOrganisationResult
+            });
     }
 
     private static async Task<HttpResponseData> WriteJsonAsync(HttpResponseData response, object value)

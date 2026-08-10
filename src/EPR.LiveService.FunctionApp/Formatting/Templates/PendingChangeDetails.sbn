@@ -86,7 +86,7 @@
             status.textContent = 'Running query...';
 
             try {
-                const response = await fetch('/api/pending-change-details', {
+                const response = await fetch('/api/update-pending-change-details', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

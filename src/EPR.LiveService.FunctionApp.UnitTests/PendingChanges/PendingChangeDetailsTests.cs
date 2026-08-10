@@ -61,7 +61,7 @@ public class PendingChangeDetailsTests
         html.Should().Contain("name=\"RegulatorResponse\" value=\"Accepted\"");
         html.Should().Contain("name=\"RegulatorResponse\" value=\"Rejected\"");
         html.Should().Contain("name=\"RegulatorComments\"");
-        html.Should().Contain("fetch('/api/pending-change-details'");
+        html.Should().Contain("fetch('/api/update-pending-change-details'");
     }
 
     [TestMethod]

@@ -1,4 +1,4 @@
-using EPR.LiveService.FunctionApp.Extentions;
+using EPR.LiveService.FunctionApp.Extensions;
 using System.Security.Claims;
 
 namespace EPR.LiveService.FunctionApp.Authorisation;
