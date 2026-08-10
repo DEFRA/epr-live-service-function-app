@@ -4,7 +4,7 @@ namespace EPR.LiveService.FunctionApp.Services;
 
 public interface IOrganisationService
 {
-    Task<string> UpdateOrganisationAsync(
+    Task<OrganisationUpdateResponse> UpdateOrganisationAsync(
         PendingChangeRegulatorDetails pendingChangeRegulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment,

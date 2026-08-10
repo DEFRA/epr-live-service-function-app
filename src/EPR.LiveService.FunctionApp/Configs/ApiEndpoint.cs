@@ -4,11 +4,11 @@ using Microsoft.Extensions.Configuration;
 namespace EPR.LiveService.FunctionApp.Configs;
 
 [ExcludeFromCodeCoverage]
-public class ApiEndpoints
+public class ApiEndpoint
 {
-    public const string SectionName = "ApiEndpoints";
+    public const string SectionName = "ApiEndpoint";
 
-    private ApiEndpoints(
+    private ApiEndpoint(
         string regulatorOrganisationApproval)
     {
         RegulatorOrganisationApproval = regulatorOrganisationApproval;
@@ -17,11 +17,11 @@ public class ApiEndpoints
     public string RegulatorOrganisationApproval { get; }
 
 
-    public static ApiEndpoints FromConfiguration(IConfigurationSection configuration)
+    public static ApiEndpoint FromConfiguration(IConfigurationSection configuration)
     {
         var regulatorOrganisationApproval = configuration.GetRequiredValue(
             nameof(RegulatorOrganisationApproval));
 
-        return new ApiEndpoints(regulatorOrganisationApproval);
+        return new ApiEndpoint(regulatorOrganisationApproval);
     }
 }

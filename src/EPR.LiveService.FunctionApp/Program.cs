@@ -37,8 +37,8 @@ builder.Services.AddSingleton(
         builder.Configuration.GetSection(ApiConfig.SectionName)));
 
 builder.Services.AddSingleton(
-    ApiEndpoints.FromConfiguration(
-        builder.Configuration.GetSection(ApiEndpoints.SectionName)));
+    ApiEndpoint.FromConfiguration(
+        builder.Configuration.GetSection(ApiEndpoint.SectionName)));
 
 // Services & HttpClients
 builder.Services.AddServicesAndHttpClients();
