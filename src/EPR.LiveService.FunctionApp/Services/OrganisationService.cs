@@ -118,7 +118,6 @@ public class OrganisationService(
             {
                 await ThrowForUnsuccessfulResponseAsync(
                     response,
-                    regulatorDetails.ChangeHistoryExternalId,
                     cancellationToken);
             }
 
@@ -138,9 +137,8 @@ public class OrganisationService(
         }
     }
 
-    private async Task ThrowForUnsuccessfulResponseAsync(
+    private static async Task ThrowForUnsuccessfulResponseAsync(
         HttpResponseMessage response,
-        Guid changeHistoryExternalId,
         CancellationToken cancellationToken)
     {
         _ = await response.Content.ReadAsStringAsync(cancellationToken);

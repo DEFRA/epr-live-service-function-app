@@ -2,9 +2,11 @@ using EPR.LiveService.FunctionApp.Configs;
 using EPR.LiveService.FunctionApp.Handlers;
 using EPR.LiveService.FunctionApp.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace FacadeAccountCreation.API.Extensions;
 
+[ExcludeFromCodeCoverage]
 public static class HttpClientServiceCollectionExtension
 {
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)

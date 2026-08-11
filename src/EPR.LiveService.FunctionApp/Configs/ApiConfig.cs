@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using EPR.LiveService.FunctionApp.Extensions;
 using Microsoft.Extensions.Configuration;
 
 namespace EPR.LiveService.FunctionApp.Configs;

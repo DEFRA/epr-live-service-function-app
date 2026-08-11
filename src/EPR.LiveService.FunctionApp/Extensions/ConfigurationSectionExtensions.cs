@@ -1,7 +1,9 @@
 using Microsoft.Extensions.Configuration;
+using System.Diagnostics.CodeAnalysis;
 
-namespace EPR.LiveService.FunctionApp.Configs;
+namespace EPR.LiveService.FunctionApp.Extensions;
 
+[ExcludeFromCodeCoverage]
 internal static class ConfigurationSectionExtensions
 {
     public static string GetRequiredValue(
