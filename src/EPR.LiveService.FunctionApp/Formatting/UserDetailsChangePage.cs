@@ -1,11 +1,11 @@
-using EPR.LiveService.FunctionApp.PendingChanges;
+using EPR.LiveService.FunctionApp.UserDetailsChange;
 
 namespace EPR.LiveService.FunctionApp.Formatting;
 
-public static class PendingChangeDetailsPage
+public static class UserDetailsChangePage
 {
-    public static string Build(PendingChangeDetailsRequest? values = null) => TemplateRenderer.Render(
-        "PendingChangeDetails.sbn",
+    public static string Build(UserDetailsChangeRequest? values = null) => TemplateRenderer.Render(
+        "UpdateUserDetails.sbn",
         new
         {
             BearerToken = values?.BearerToken ?? string.Empty,

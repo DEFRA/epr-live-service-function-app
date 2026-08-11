@@ -1,6 +1,6 @@
-namespace EPR.LiveService.FunctionApp.PendingChanges;
+namespace EPR.LiveService.FunctionApp.UserDetailsChange;
 
-public class PendingChangeDetailsResult
+public class RegulatorDetails
 {
     public Guid XEprUser { get; set; }
 

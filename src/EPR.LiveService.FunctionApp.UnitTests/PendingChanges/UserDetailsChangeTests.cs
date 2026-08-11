@@ -1,12 +1,12 @@
 using EPR.LiveService.FunctionApp.Formatting;
-using EPR.LiveService.FunctionApp.PendingChanges;
+using EPR.LiveService.FunctionApp.UserDetailsChange;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace EPR.LiveService.FunctionApp.UnitTests.PendingChanges;
+namespace EPR.LiveService.FunctionApp.UnitTests.UserDetailsChange;
 
 [TestClass]
-public class PendingChangeDetailsTests
+public class UserDetailsChangeTests
 {
     [TestMethod]
     public void ValidRequest_ShouldHaveNoValidationErrors()
@@ -17,7 +17,7 @@ public class PendingChangeDetailsTests
     [TestMethod]
     public void InvalidRequest_ShouldReportMissingAndMalformedValues()
     {
-        var request = new PendingChangeDetailsRequest
+        var request = new UserDetailsChangeRequest
         {
             BearerToken = null,
             RegulatorEmail = "not-an-email",
@@ -50,9 +50,9 @@ public class PendingChangeDetailsTests
     [TestMethod]
     public void Form_ShouldCollectEveryRequiredParameter()
     {
-        var html = PendingChangeDetailsPage.Build();
+        var html = UserDetailsChangePage.Build();
 
-        html.Should().Contain("Pending Change Details");
+        html.Should().Contain("Update User Details");
         html.Should().Contain("type=\"password\" id=\"BearerToken\" name=\"BearerToken\"")
             .And.Contain("autocomplete=\"off\"");
         html.Should().Contain("name=\"RegulatorEmail\"").And.Contain("required");
@@ -61,13 +61,13 @@ public class PendingChangeDetailsTests
         html.Should().Contain("name=\"RegulatorResponse\" value=\"Accepted\"");
         html.Should().Contain("name=\"RegulatorResponse\" value=\"Rejected\"");
         html.Should().Contain("name=\"RegulatorComments\"");
-        html.Should().Contain("fetch('/api/pending-change-details'");
+        html.Should().Contain("fetch('/api/update-user-details'");
     }
 
     [TestMethod]
     public void Form_ShouldPrefillProvidedFieldsAndEscapeThem()
     {
-        var html = PendingChangeDetailsPage.Build(new PendingChangeDetailsRequest
+        var html = UserDetailsChangePage.Build(new UserDetailsChangeRequest
         {
             BearerToken = "token<&>",
             RegulatorEmail = "regulator@example.com",
@@ -84,7 +84,7 @@ public class PendingChangeDetailsTests
         html.Should().Contain("id=\"UserEmail\" name=\"UserEmail\" value=\"\"");
     }
 
-    private static PendingChangeDetailsRequest ValidRequest() => new()
+    private static UserDetailsChangeRequest ValidRequest() => new()
     {
         BearerToken = "test-token",
         RegulatorEmail = "regulator@example.com",

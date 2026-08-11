@@ -23,3 +23,20 @@ authenticated endpoints such as `GET /api/me` can be exercised locally.
 
 The middleware does not replace a header supplied by the caller and is not
 registered in non-development environments.
+
+## API endpoint configuration
+
+The regulator organisation approval endpoint is configured using:
+
+```text
+ApiEndpoint__RegulatorOrganisationApproval=api/regulators/regulator-organisation/approval/
+```
+
+The value must include the trailing slash because the change-history identifier
+is appended to it when the request is created.
+
+`ApiConfig__OrganisationServiceBaseUrl`,
+`ApiConfig__OrganisationServiceClientId`,
+`ApiConfig__Timeout`, and `ApiEndpoint__RegulatorOrganisationApproval` are all
+required. The application validates them during startup, and `Timeout` must be a
+positive integer.

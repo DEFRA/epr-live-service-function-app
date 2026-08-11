@@ -1,7 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Security.Claims;
 
-namespace EPR.LiveService.FunctionApp.Extentions;
+namespace EPR.LiveService.FunctionApp.Extensions;
 
 [ExcludeFromCodeCoverage]
 public static class ClaimsPrincipalExtensions

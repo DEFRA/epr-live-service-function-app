@@ -2,16 +2,16 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <title>Pending Change Details</title>
+    <title>Update User Details</title>
     <style>
 {{ include "Styles.sbn" }}
     </style>
 </head>
 <body class="narrow">
     <a class="back-link" href="/api/queries">&larr; Back to all queries</a>
-    <h1>Pending Change Details</h1>
+    <h1>Update User Details</h1>
 
-    <form id="pending-change-form">
+    <form id="update-user-details-form">
         <label for="RegulatorEmail">Regulator email</label>
         <input type="email" id="RegulatorEmail" name="RegulatorEmail" value="{{ regulator_email | html.escape }}" required />
 
@@ -41,7 +41,7 @@
         <label for="BearerToken">Bearer token</label>
         <input type="password" id="BearerToken" name="BearerToken" value="{{ bearer_token | html.escape }}" autocomplete="off" required />
 
-        <button class="submit-button" type="submit">Apply pending change update</button>
+        <button class="submit-button" type="submit">Apply user details update</button>
     </form>
 
     <div id="status" role="status" aria-live="polite"></div>
@@ -72,7 +72,7 @@
 
         responseInputs.forEach(input => input.addEventListener('change', updateRegulatorComments));
 
-        document.getElementById('pending-change-form').addEventListener('submit', async (event) => {
+        document.getElementById('update-user-details-form').addEventListener('submit', async (event) => {
             event.preventDefault();
             const form = event.target;
             const status = document.getElementById('status');
@@ -86,7 +86,7 @@
             status.textContent = 'Running query...';
 
             try {
-                const response = await fetch('/api/pending-change-details', {
+                const response = await fetch('/api/update-user-details', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)

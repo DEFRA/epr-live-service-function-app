@@ -66,6 +66,32 @@ public class TemplateRenderingTests
     }
 
     [TestMethod]
+    public void ListQueries_ShouldSeparateStaticAndDefinitionQueriesIntoAccessibleTabs()
+    {
+        var definition = new QueryDefinition
+        {
+            Id = "organisation_details",
+            DisplayName = "Organisation details",
+            Description = "Find an organisation",
+            Parameters = []
+        };
+
+        var html = TemplateRenderer.Render(
+            "ListQueries.sbn",
+            new { Definitions = new[] { definition } });
+
+        html.Should().Contain("role=\"tablist\"");
+        html.Should().Contain("id=\"update-queries-tab\"");
+        html.Should().Contain("id=\"definition-queries-tab\"");
+        html.Should().Contain("id=\"update-queries-panel\" role=\"tabpanel\"");
+        html.Should().Contain("id=\"definition-queries-panel\" role=\"tabpanel\"");
+        html.Should().Contain("href=\"/api/resend-invite-email\"");
+        html.Should().Contain("href=\"/api/query/organisation_details\"");
+        html.Should().Contain("ArrowRight");
+        html.Should().Contain("ArrowLeft");
+    }
+
+    [TestMethod]
     public void QueryFormPage_WithMultipleOutputs_ShouldRenderRadioButtonsInDeclaredOrder()
     {
         var definition = new QueryDefinition

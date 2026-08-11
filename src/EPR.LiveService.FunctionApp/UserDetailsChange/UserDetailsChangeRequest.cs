@@ -1,8 +1,8 @@
 using System.Net.Mail;
 
-namespace EPR.LiveService.FunctionApp.PendingChanges;
+namespace EPR.LiveService.FunctionApp.UserDetailsChange;
 
-public class PendingChangeDetailsRequest
+public class UserDetailsChangeRequest
 {
     public string? BearerToken { get; set; }
 

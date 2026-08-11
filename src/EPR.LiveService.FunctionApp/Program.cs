@@ -1,9 +1,11 @@
 using Azure.Monitor.OpenTelemetry.Exporter;
+using EPR.LiveService.FunctionApp.Configs;
 using EPR.LiveService.FunctionApp.Formatting;
 using EPR.LiveService.FunctionApp.Middleware;
 using EPR.LiveService.FunctionApp.Notifications;
 using EPR.LiveService.FunctionApp.Queries;
 using EPR.LiveService.FunctionApp.Sql;
+using FacadeAccountCreation.API.Extensions;
 using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,6 +31,17 @@ if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHT
         .UseFunctionsWorkerDefaults()
         .UseAzureMonitorExporter();
 }
+
+builder.Services.AddSingleton(
+    ApiConfig.FromConfiguration(
+        builder.Configuration.GetSection(ApiConfig.SectionName)));
+
+builder.Services.AddSingleton(
+    ApiEndpoint.FromConfiguration(
+        builder.Configuration.GetSection(ApiEndpoint.SectionName)));
+
+// Services & HttpClients
+builder.Services.AddServicesAndHttpClients();
 
 builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
     builder.Configuration.GetSection("SqlTargets"));

@@ -1,7 +1,7 @@
 {
-  "id": "identify_pending_changes",
-  "displayName": "Identify Pending Changes",
-  "description": "Returns pending change history for active organisations and users",
+  "id": "identify_user_details_changes",
+  "displayName": "User Details Changes",
+  "description": "Returns user details change history for active organisations and users",
   "target": "accounts",
   "parameters": [
     {
