@@ -1,7 +1,7 @@
 using System.Net;
 using Dapper;
 using EPR.LiveService.FunctionApp.Formatting;
-using EPR.LiveService.FunctionApp.PendingChanges;
+using EPR.LiveService.FunctionApp.UserDetailsChange;
 using EPR.LiveService.FunctionApp.Services;
 using EPR.LiveService.FunctionApp.Sql;
 using Microsoft.Azure.Functions.Worker;
@@ -9,41 +9,41 @@ using Microsoft.Azure.Functions.Worker.Http;
 
 namespace EPR.LiveService.FunctionApp.Functions;
 
-public class PendingChangeDetailsFunction(
+public class UserDetailsChangeFunction(
     ISqlConnectionFactory connectionFactory,
     IOrganisationService organisationService)
     {
-    [Function("PendingChangeDetailsForm")]
+    [Function("UserDetailsChangeForm")]
     [AuthorizeFunction(Roles.Admin)]
     public static async Task<HttpResponseData> ShowForm(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "pending-change-details")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "user-details-change")] HttpRequestData req)
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-        await response.WriteStringAsync(PendingChangeDetailsPage.Build(new PendingChangeDetailsRequest
+        await response.WriteStringAsync(UserDetailsChangePage.Build(new UserDetailsChangeRequest
         {
-            RegulatorEmail = req.Query.Get(nameof(PendingChangeDetailsRequest.RegulatorEmail)),
-            UserEmail = req.Query.Get(nameof(PendingChangeDetailsRequest.UserEmail)),
-            UserOrganisationId = req.Query.Get(nameof(PendingChangeDetailsRequest.UserOrganisationId))
+            RegulatorEmail = req.Query.Get(nameof(UserDetailsChangeRequest.RegulatorEmail)),
+            UserEmail = req.Query.Get(nameof(UserDetailsChangeRequest.UserEmail)),
+            UserOrganisationId = req.Query.Get(nameof(UserDetailsChangeRequest.UserOrganisationId))
         }));
         return response;
     }
 
-    [Function("UpdatePendingChangeDetails")]
+    [Function("UserDetailsUpdate")]
     [AuthorizeFunction(Roles.Admin)]
     public async Task<HttpResponseData> RunQuery(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-pending-change-details")]
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-user-details")]
             HttpRequestData req, CancellationToken cancellationToken)
     {
-        var pendingChangeDetailsRequest = await req.ReadFromJsonAsync<PendingChangeDetailsRequest>();
-        if (pendingChangeDetailsRequest is null)
+        var userDetailsChangeRequest = await req.ReadFromJsonAsync<UserDetailsChangeRequest>();
+        if (userDetailsChangeRequest is null)
         {
             return await WriteJsonAsync(
                 req.CreateResponse(HttpStatusCode.BadRequest),
                 new { error = "A JSON request body is required." });
         }
 
-        var errors = pendingChangeDetailsRequest.Validate();
+        var errors = userDetailsChangeRequest.Validate();
         if (errors.Count > 0)
         {
             return await WriteJsonAsync(
@@ -95,31 +95,31 @@ public class PendingChangeDetailsFunction(
             """;
 
         using var connection = await connectionFactory.CreateConnectionAsync("accounts");
-        var pendingChangeRegulatorDetails = await connection.QueryFirstOrDefaultAsync<PendingChangeRegulatorDetails>(regulatorDetailsSql, pendingChangeDetailsRequest);
+        var regulatorDetails = await connection.QueryFirstOrDefaultAsync<RegulatorDetails>(regulatorDetailsSql, userDetailsChangeRequest);
 
-        if (pendingChangeRegulatorDetails is null)
+        if (regulatorDetails is null)
         {
             return await WriteJsonAsync(
                 req.CreateResponse(HttpStatusCode.NotFound),
-                new { error = "No matching regulator or pending change history was found." });
+                new { error = "No matching regulator or user details change history was found." });
         }
 
         var updateOrganisationResult = await organisationService.UpdateOrganisationAsync(
-            pendingChangeRegulatorDetails,
-            pendingChangeDetailsRequest.RegulatorResponse!.Equals(
+            regulatorDetails,
+            userDetailsChangeRequest.RegulatorResponse!.Equals(
                 "Accepted",
                 StringComparison.OrdinalIgnoreCase),
-            pendingChangeDetailsRequest.RegulatorComments ?? string.Empty,
-            pendingChangeDetailsRequest.BearerToken!,
+            userDetailsChangeRequest.RegulatorComments ?? string.Empty,
+            userDetailsChangeRequest.BearerToken!,
             cancellationToken);
 
         return await WriteJsonAsync(
             req.CreateResponse(HttpStatusCode.OK),
             new
             {
-                pendingChangeRegulatorDetails.XEprUser,
-                pendingChangeRegulatorDetails.XEprOrganisation,
-                pendingChangeRegulatorDetails.ChangeHistoryExternalId,
+                regulatorDetails.XEprUser,
+                regulatorDetails.XEprOrganisation,
+                regulatorDetails.ChangeHistoryExternalId,
                 UpdateOrganisationResult = updateOrganisationResult
             });
     }

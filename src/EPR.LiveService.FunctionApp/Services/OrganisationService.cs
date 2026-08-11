@@ -1,5 +1,5 @@
 using EPR.LiveService.FunctionApp.Configs;
-using EPR.LiveService.FunctionApp.PendingChanges;
+using EPR.LiveService.FunctionApp.UserDetailsChange;
 using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Http.Headers;
@@ -14,7 +14,7 @@ public class OrganisationService(
     ILogger<OrganisationService> logger) : IOrganisationService
 {
     public async Task<OrganisationUpdateResponse> UpdateOrganisationAsync(
-        PendingChangeRegulatorDetails pendingChangeRegulatorDetails,
+        RegulatorDetails regulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment,
         string bearerToken,
@@ -23,7 +23,7 @@ public class OrganisationService(
         try
         {
             return await UpdateOrganisationCoreAsync(
-                pendingChangeRegulatorDetails,
+                regulatorDetails,
                 hasRegulatorAccepted,
                 regulatorComment,
                 bearerToken,
@@ -34,7 +34,7 @@ public class OrganisationService(
             logger.LogWarning(
                 exception,
                 "The organisation service POST request was cancelled for change history {ChangeHistoryExternalId}.",
-                pendingChangeRegulatorDetails.ChangeHistoryExternalId);
+                regulatorDetails.ChangeHistoryExternalId);
 
             throw;
         }
@@ -43,7 +43,7 @@ public class OrganisationService(
             logger.LogError(
                 exception,
                 "The organisation service POST request failed for change history {ChangeHistoryExternalId} with status {StatusCode}.",
-                pendingChangeRegulatorDetails.ChangeHistoryExternalId,
+                regulatorDetails.ChangeHistoryExternalId,
                 exception.StatusCode);
 
             throw;
@@ -53,14 +53,14 @@ public class OrganisationService(
             logger.LogError(
                 exception,
                 "The organisation service POST request failed for change history {ChangeHistoryExternalId}.",
-                pendingChangeRegulatorDetails.ChangeHistoryExternalId);
+                regulatorDetails.ChangeHistoryExternalId);
 
             throw;
         }
     }
 
     private async Task<OrganisationUpdateResponse> UpdateOrganisationCoreAsync(
-        PendingChangeRegulatorDetails pendingChangeRegulatorDetails,
+        RegulatorDetails regulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment,
         string bearerToken,
@@ -68,7 +68,7 @@ public class OrganisationService(
     {
         using var request = new HttpRequestMessage(
             HttpMethod.Post,
-            $"{apiEndpoints.RegulatorOrganisationApproval}{pendingChangeRegulatorDetails.ChangeHistoryExternalId}")
+            $"{apiEndpoints.RegulatorOrganisationApproval}{regulatorDetails.ChangeHistoryExternalId}")
             {
                 Content = JsonContent.Create(
                     new {
@@ -84,11 +84,11 @@ public class OrganisationService(
 
         request.Headers.Add(
             "X-EPR-User",
-            pendingChangeRegulatorDetails.XEprUser.ToString());
+            regulatorDetails.XEprUser.ToString());
 
         request.Headers.Add(
             "X-EPR-Organisation",
-            pendingChangeRegulatorDetails.XEprOrganisation.ToString());
+            regulatorDetails.XEprOrganisation.ToString());
 
         HttpResponseMessage response;
 
@@ -118,7 +118,7 @@ public class OrganisationService(
             {
                 await ThrowForUnsuccessfulResponseAsync(
                     response,
-                    pendingChangeRegulatorDetails.ChangeHistoryExternalId,
+                    regulatorDetails.ChangeHistoryExternalId,
                     cancellationToken);
             }
 
@@ -155,7 +155,7 @@ public class OrganisationService(
         HttpStatusCode.BadRequest => "The organisation service rejected the request.",
         HttpStatusCode.Unauthorized => "The organisation service did not accept the supplied credentials.",
         HttpStatusCode.Forbidden => "The organisation service denied access to the requested operation.",
-        HttpStatusCode.NotFound => "The organisation or pending change was not found.",
+        HttpStatusCode.NotFound => "The organisation or user details change was not found.",
         HttpStatusCode.Conflict => "The organisation update conflicts with its current state.",
         HttpStatusCode.TooManyRequests => "The organisation service rate limit was exceeded.",
         _ when (statusCode >= HttpStatusCode.InternalServerError) =>

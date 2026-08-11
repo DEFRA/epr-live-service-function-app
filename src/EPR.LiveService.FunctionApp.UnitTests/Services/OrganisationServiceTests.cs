@@ -1,8 +1,8 @@
 using System.Net;
 using System.Text;
 using EPR.LiveService.FunctionApp.Configs;
-using EPR.LiveService.FunctionApp.PendingChanges;
 using EPR.LiveService.FunctionApp.Services;
+using EPR.LiveService.FunctionApp.UserDetailsChange;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -78,7 +78,7 @@ public class OrganisationServiceTests
         var configuration = new ConfigurationBuilder()
             .AddInMemoryCollection(new Dictionary<string, string?>
             {
-                ["ApiEndpoints:RegulatorOrganisationApproval"] =
+                [$"{ApiEndpoint.SectionName}:{nameof(ApiEndpoint.RegulatorOrganisationApproval)}"] =
                     "api/regulators/regulator-organisation/approval/"
             })
             .Build();
@@ -95,7 +95,7 @@ public class OrganisationServiceTests
             NullLogger<OrganisationService>.Instance);
     }
 
-    private static PendingChangeRegulatorDetails CreateDetails() => new()
+    private static RegulatorDetails CreateDetails() => new()
     {
         XEprUser = Guid.NewGuid(),
         XEprOrganisation = Guid.NewGuid(),

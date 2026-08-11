@@ -1,7 +1,7 @@
 using System.Net;
 using EPR.LiveService.FunctionApp.Configs;
-using EPR.LiveService.FunctionApp.PendingChanges;
 using EPR.LiveService.FunctionApp.Services;
+using EPR.LiveService.FunctionApp.UserDetailsChange;
 using FluentAssertions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging.Abstractions;
@@ -22,9 +22,9 @@ public class OrganisationServiceWireMockTests
     public async Task UpdateOrganisationAsync_WhenRequestIsAccepted_ReturnsAcceptedResponse()
     {
         using var server = WireMockServer.Start();
-        var pendingChangeRegulatorDetails = CreatePendingChangeRegulatorDetails();
+        var regulatorDetails = CreateRegulatorDetails();
         const string regulatorComment = "";
-        var request = CreateRequest(pendingChangeRegulatorDetails, true, regulatorComment);
+        var request = CreateRequest(regulatorDetails, true, regulatorComment);
         server
             .Given(request)
             .RespondWith(Response.Create()
@@ -39,7 +39,7 @@ public class OrganisationServiceWireMockTests
 
         using var httpClient = CreateHttpClient(server);
         var result = await CreateService(httpClient).UpdateOrganisationAsync(
-            pendingChangeRegulatorDetails,
+            regulatorDetails,
             true,
             regulatorComment,
             BearerToken);
@@ -54,9 +54,9 @@ public class OrganisationServiceWireMockTests
     public async Task UpdateOrganisationAsync_WhenRequestIsRejected_ReturnsRejectedResponse()
     {
         using var server = WireMockServer.Start();
-        var pendingChangeRegulatorDetails = CreatePendingChangeRegulatorDetails();
+        var regulatorDetails = CreateRegulatorDetails();
         const string regulatorComment = "requires change of AP request";
-        var request = CreateRequest(pendingChangeRegulatorDetails, false, regulatorComment);
+        var request = CreateRequest(regulatorDetails, false, regulatorComment);
         server
             .Given(request)
             .RespondWith(Response.Create()
@@ -66,7 +66,7 @@ public class OrganisationServiceWireMockTests
 
         using var httpClient = CreateHttpClient(server);
         var result = await CreateService(httpClient).UpdateOrganisationAsync(
-            pendingChangeRegulatorDetails,
+            regulatorDetails,
             false,
             regulatorComment,
             BearerToken);
@@ -88,7 +88,7 @@ public class OrganisationServiceWireMockTests
     [DataRow(400, "The organisation service rejected the request.")]
     [DataRow(401, "The organisation service did not accept the supplied credentials.")]
     [DataRow(403, "The organisation service denied access to the requested operation.")]
-    [DataRow(404, "The organisation or pending change was not found.")]
+    [DataRow(404, "The organisation or user details change was not found.")]
     [DataRow(409, "The organisation update conflicts with its current state.")]
     [DataRow(429, "The organisation service rate limit was exceeded.")]
     [DataRow(500, "The organisation service encountered an error.")]
@@ -98,9 +98,9 @@ public class OrganisationServiceWireMockTests
         string expectedMessage)
     {
         using var server = WireMockServer.Start();
-        var pendingChangeRegulatorDetails = CreatePendingChangeRegulatorDetails();
+        var regulatorDetails = CreateRegulatorDetails();
         const string regulatorComment = "WireMock error scenario";
-        var request = CreateRequest(pendingChangeRegulatorDetails, true, regulatorComment);
+        var request = CreateRequest(regulatorDetails, true, regulatorComment);
         server
             .Given(request)
             .RespondWith(Response.Create()
@@ -109,7 +109,7 @@ public class OrganisationServiceWireMockTests
 
         using var httpClient = CreateHttpClient(server);
         var action = () => CreateService(httpClient).UpdateOrganisationAsync(
-            pendingChangeRegulatorDetails,
+            regulatorDetails,
             true,
             regulatorComment,
             BearerToken);
@@ -124,9 +124,9 @@ public class OrganisationServiceWireMockTests
     public async Task UpdateOrganisationAsync_WhenEndpointReturnsMalformedJson_ThrowsInvalidResponseException()
     {
         using var server = WireMockServer.Start();
-        var pendingChangeRegulatorDetails = CreatePendingChangeRegulatorDetails();
+        var regulatorDetails = CreateRegulatorDetails();
         const string regulatorComment = "Malformed response scenario";
-        var request = CreateRequest(pendingChangeRegulatorDetails, true, regulatorComment);
+        var request = CreateRequest(regulatorDetails, true, regulatorComment);
         server
             .Given(request)
             .RespondWith(Response.Create()
@@ -134,33 +134,33 @@ public class OrganisationServiceWireMockTests
                 .WithHeader("Content-Type", "application/json")
                 .WithBody("not-json"));
 
-        await VerifyInvalidResponseAsync(server, request, pendingChangeRegulatorDetails, regulatorComment);
+        await VerifyInvalidResponseAsync(server, request, regulatorDetails, regulatorComment);
     }
 
     [TestMethod]
     public async Task UpdateOrganisationAsync_WhenEndpointReturnsEmptyBody_ThrowsInvalidResponseException()
     {
         using var server = WireMockServer.Start();
-        var pendingChangeRegulatorDetails = CreatePendingChangeRegulatorDetails();
+        var regulatorDetails = CreateRegulatorDetails();
         const string regulatorComment = "Empty response scenario";
-        var request = CreateRequest(pendingChangeRegulatorDetails, true, regulatorComment);
+        var request = CreateRequest(regulatorDetails, true, regulatorComment);
         server
             .Given(request)
             .RespondWith(Response.Create()
                 .WithStatusCode(HttpStatusCode.OK));
 
-        await VerifyInvalidResponseAsync(server, request, pendingChangeRegulatorDetails, regulatorComment);
+        await VerifyInvalidResponseAsync(server, request, regulatorDetails, regulatorComment);
     }
 
     private static async Task VerifyInvalidResponseAsync(
         WireMockServer server,
         IRequestBuilder request,
-        PendingChangeRegulatorDetails pendingChangeRegulatorDetails,
+        RegulatorDetails regulatorDetails,
         string regulatorComment)
     {
         using var httpClient = CreateHttpClient(server);
         var action = () => CreateService(httpClient).UpdateOrganisationAsync(
-            pendingChangeRegulatorDetails,
+            regulatorDetails,
             true,
             regulatorComment,
             BearerToken);
@@ -173,14 +173,14 @@ public class OrganisationServiceWireMockTests
     }
 
     private static IRequestBuilder CreateRequest(
-        PendingChangeRegulatorDetails pendingChangeRegulatorDetails,
+        RegulatorDetails regulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment) => Request.Create()
-            .WithPath($"/{ApprovalEndpoint}{pendingChangeRegulatorDetails.ChangeHistoryExternalId}")
+            .WithPath($"/{ApprovalEndpoint}{regulatorDetails.ChangeHistoryExternalId}")
             .UsingPost()
             .WithHeader("Authorization", $"Bearer {BearerToken}")
-            .WithHeader("X-EPR-User", pendingChangeRegulatorDetails.XEprUser.ToString())
-            .WithHeader("X-EPR-Organisation", pendingChangeRegulatorDetails.XEprOrganisation.ToString())
+            .WithHeader("X-EPR-User", regulatorDetails.XEprUser.ToString())
+            .WithHeader("X-EPR-Organisation", regulatorDetails.XEprOrganisation.ToString())
             .WithBodyAsJson(new
             {
                 regulatorComment,
@@ -197,7 +197,7 @@ public class OrganisationServiceWireMockTests
         CreateApiEndpoint(),
         NullLogger<OrganisationService>.Instance);
 
-    private static PendingChangeRegulatorDetails CreatePendingChangeRegulatorDetails() => new()
+    private static RegulatorDetails CreateRegulatorDetails() => new()
     {
         XEprUser = Guid.Parse("5dd870a9-5b91-4e66-9d4f-d9fc44e891d5"),
         XEprOrganisation = Guid.Parse("5a937d4d-6934-45f0-bafe-b2368ef46f41"),
