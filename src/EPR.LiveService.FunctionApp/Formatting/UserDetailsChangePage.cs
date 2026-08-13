@@ -8,7 +8,6 @@ public static class UserDetailsChangePage
         "UpdateUserDetails.sbn",
         new
         {
-            BearerToken = values?.BearerToken ?? string.Empty,
             RegulatorEmail = values?.RegulatorEmail ?? string.Empty,
             UserEmail = values?.UserEmail ?? string.Empty,
             UserOrganisationId = values?.UserOrganisationId ?? string.Empty,

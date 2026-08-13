@@ -19,7 +19,6 @@ public class UserDetailsChangeTests
     {
         var request = new UserDetailsChangeRequest
         {
-            BearerToken = null,
             RegulatorEmail = "not-an-email",
             UserEmail = null,
             UserOrganisationId = " ",
@@ -27,7 +26,6 @@ public class UserDetailsChangeTests
         };
 
         request.Validate().Should().BeEquivalentTo(
-            "BearerToken is required.",
             "UserEmail is required.",
             "UserOrganisationId is required.",
             "RegulatorEmail must be a valid email address.",
@@ -53,8 +51,6 @@ public class UserDetailsChangeTests
         var html = UserDetailsChangePage.Build();
 
         html.Should().Contain("Update User Details");
-        html.Should().Contain("type=\"password\" id=\"BearerToken\" name=\"BearerToken\"")
-            .And.Contain("autocomplete=\"off\"");
         html.Should().Contain("name=\"RegulatorEmail\"").And.Contain("required");
         html.Should().Contain("name=\"UserEmail\"");
         html.Should().Contain("name=\"UserOrganisationId\"");
@@ -69,14 +65,12 @@ public class UserDetailsChangeTests
     {
         var html = UserDetailsChangePage.Build(new UserDetailsChangeRequest
         {
-            BearerToken = "token<&>",
             RegulatorEmail = "regulator@example.com",
             UserOrganisationId = "ORG<&>",
             RegulatorResponse = "Rejected",
             RegulatorComments = "Reason <&>"
         });
 
-        html.Should().Contain("value=\"token&lt;&amp;&gt;\"");
         html.Should().Contain("value=\"regulator@example.com\"");
         html.Should().Contain("value=\"ORG&lt;&amp;&gt;\"");
         html.Should().Contain("value=\"Rejected\" checked");
@@ -86,7 +80,6 @@ public class UserDetailsChangeTests
 
     private static UserDetailsChangeRequest ValidRequest() => new()
     {
-        BearerToken = "test-token",
         RegulatorEmail = "regulator@example.com",
         UserEmail = "user@example.com",
         UserOrganisationId = "123456",

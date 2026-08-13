@@ -13,6 +13,8 @@ public class UserDetailsChangeFunction(
     ISqlConnectionFactory connectionFactory,
     IOrganisationService organisationService)
     {
+    private const string EasyAuthAccessTokenHeader = "X-MS-TOKEN-AAD-ACCESS-TOKEN";
+
     [Function("UserDetailsChangeForm")]
     [AuthorizeFunction(Roles.Admin)]
     public static async Task<HttpResponseData> ShowForm(
@@ -50,6 +52,16 @@ public class UserDetailsChangeFunction(
                 req.CreateResponse(HttpStatusCode.BadRequest),
                 new { errors });
         }
+
+        if (!req.Headers.TryGetValues(EasyAuthAccessTokenHeader, out var accessTokenValues)
+            || string.IsNullOrWhiteSpace(accessTokenValues.FirstOrDefault()))
+        {
+            return await WriteJsonAsync(
+                req.CreateResponse(HttpStatusCode.Unauthorized),
+                new { error = "Azure Easy Auth did not supply an access token." });
+        }
+
+        var bearerToken = accessTokenValues.First();
 
         string regulatorDetailsSql = """
             WITH RegulatorDetails AS
@@ -110,7 +122,7 @@ public class UserDetailsChangeFunction(
                 "Accepted",
                 StringComparison.OrdinalIgnoreCase),
             userDetailsChangeRequest.RegulatorComments ?? string.Empty,
-            userDetailsChangeRequest.BearerToken!,
+            bearerToken,
             cancellationToken);
 
         return await WriteJsonAsync(
