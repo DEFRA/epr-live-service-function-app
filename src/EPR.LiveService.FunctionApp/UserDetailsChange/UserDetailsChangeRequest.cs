@@ -4,8 +4,6 @@ namespace EPR.LiveService.FunctionApp.UserDetailsChange;
 
 public class UserDetailsChangeRequest
 {
-    public string? BearerToken { get; set; }
-
     public string? RegulatorEmail { get; set; }
 
     public string? UserEmail { get; set; }
@@ -20,7 +18,6 @@ public class UserDetailsChangeRequest
     {
         var errors = new List<string>();
 
-        AddRequiredError(errors, BearerToken, nameof(BearerToken));
         AddRequiredError(errors, RegulatorEmail, nameof(RegulatorEmail));
         AddRequiredError(errors, UserEmail, nameof(UserEmail));
         AddRequiredError(errors, UserOrganisationId, nameof(UserOrganisationId));

@@ -38,9 +38,6 @@
             <textarea id="RegulatorComments" name="RegulatorComments" rows="5"{{ if rejected }} required{{ end }}>{{ regulator_comments | html.escape }}</textarea>
         </div>
 
-        <label for="BearerToken">Bearer token</label>
-        <input type="password" id="BearerToken" name="BearerToken" value="{{ bearer_token | html.escape }}" autocomplete="off" required />
-
         <button class="submit-button" type="submit">Apply user details update</button>
     </form>
 
