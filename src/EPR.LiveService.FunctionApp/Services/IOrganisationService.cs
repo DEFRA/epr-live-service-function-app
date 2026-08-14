@@ -8,6 +8,5 @@ public interface IOrganisationService
         RegulatorDetails regulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment,
-        string bearerToken,
         CancellationToken cancellationToken = default);
 }
