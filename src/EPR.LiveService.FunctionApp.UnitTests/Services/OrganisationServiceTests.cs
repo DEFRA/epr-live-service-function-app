@@ -22,7 +22,7 @@ public class OrganisationServiceTests
             Content = new StringContent("Invalid request")
         }));
 
-        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty, "token");
+        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty);
 
         var exception = await action.Should().ThrowAsync<OrganisationServiceException>();
         exception.Which.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -37,7 +37,7 @@ public class OrganisationServiceTests
             (_, _) => throw new TaskCanceledException("Timed out"),
             logger);
 
-        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty, "token");
+        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty);
 
         var exception = await action.Should().ThrowAsync<OrganisationServiceException>();
         exception.Which.Message.Should().Be("The organisation service request timed out.");
@@ -56,58 +56,12 @@ public class OrganisationServiceTests
             HttpStatusCode.ServiceUnavailable);
         var service = CreateService((_, _) => throw requestException);
 
-        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty, "token");
+        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty);
 
         var exception = await action.Should().ThrowAsync<OrganisationServiceException>();
         exception.Which.Message.Should().Be("The organisation service request could not be completed.");
         exception.Which.StatusCode.Should().Be(HttpStatusCode.ServiceUnavailable);
         exception.Which.InnerException.Should().BeSameAs(requestException);
-    }
-
-    [DataTestMethod]
-    [DataRow("Bearer access-token")]
-    [DataRow("bearer   access-token  ")]
-    [DataRow("  access-token  ")]
-    public async Task UpdateOrganisationAsync_NormalizesBearerTokenAndBuildsExpectedRequest(string token)
-    {
-        HttpMethod? capturedMethod = null;
-        Uri? capturedUri = null;
-        string? capturedScheme = null;
-        string? capturedToken = null;
-        string? capturedUser = null;
-        string? capturedOrganisation = null;
-        string? capturedBody = null;
-        var details = CreateDetails();
-        var service = CreateService(async (request, cancellationToken) =>
-        {
-            capturedMethod = request.Method;
-            capturedUri = request.RequestUri;
-            capturedScheme = request.Headers.Authorization?.Scheme;
-            capturedToken = request.Headers.Authorization?.Parameter;
-            capturedUser = request.Headers.GetValues("X-EPR-User").Single();
-            capturedOrganisation = request.Headers.GetValues("X-EPR-Organisation").Single();
-            capturedBody = await request.Content!.ReadAsStringAsync(cancellationToken);
-            var response = new HttpResponseMessage(HttpStatusCode.OK)
-            {
-                Content = new StringContent(
-                    """{"changeHistory":{"approverComments":""},"hasUserDetailsChangeAccepted":true,"hasUserDetailsChangeRejected":false}""",
-                    Encoding.UTF8,
-                    "application/json")
-            };
-            await Task.CompletedTask;
-            return response;
-        });
-
-        await service.UpdateOrganisationAsync(details, true, string.Empty, token);
-
-        capturedMethod.Should().Be(HttpMethod.Post);
-        capturedUri!.PathAndQuery.Should().Be(
-            $"/api/regulators/regulator-organisation/approval/{details.ChangeHistoryExternalId}");
-        capturedScheme.Should().Be("Bearer");
-        capturedToken.Should().Be("access-token");
-        capturedUser.Should().Be(details.XEprUser.ToString());
-        capturedOrganisation.Should().Be(details.XEprOrganisation.ToString());
-        capturedBody.Should().Contain("\"hasRegulatorAccepted\":true");
     }
 
     [TestMethod]
@@ -117,7 +71,7 @@ public class OrganisationServiceTests
         var logger = new RecordingLogger<OrganisationService>();
         var service = CreateService((_, _) => throw expectedException, logger);
 
-        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty, "token");
+        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty);
 
         var exception = await action.Should().ThrowAsync<InvalidOperationException>();
         exception.Which.Should().BeSameAs(expectedException);
@@ -134,7 +88,7 @@ public class OrganisationServiceTests
             Content = new StringContent("not-json", Encoding.UTF8, "application/json")
         }));
 
-        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty, "token");
+        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty);
 
         var exception = await action.Should().ThrowAsync<OrganisationServiceException>();
         exception.Which.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -155,7 +109,6 @@ public class OrganisationServiceTests
             CreateDetails(),
             true,
             string.Empty,
-            "token",
             cancellationTokenSource.Token);
 
         await action.Should().ThrowAsync<OperationCanceledException>();

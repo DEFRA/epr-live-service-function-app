@@ -1,3 +1,5 @@
+using Azure.Core;
+using Azure.Identity;
 using EPR.LiveService.FunctionApp.Configs;
 using EPR.LiveService.FunctionApp.Handlers;
 using EPR.LiveService.FunctionApp.Services;
@@ -11,6 +13,7 @@ public static class HttpClientServiceCollectionExtension
 {
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)
     {
+        services.AddSingleton<TokenCredential>(new DefaultAzureCredential());
         services.AddTransient<OrganisationServiceAuthorisationHandler>();
 
         services.AddHttpClient<IOrganisationService, OrganisationService>((sp, client) =>

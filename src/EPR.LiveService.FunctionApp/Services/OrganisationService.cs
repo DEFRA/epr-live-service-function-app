@@ -2,7 +2,6 @@ using EPR.LiveService.FunctionApp.Configs;
 using EPR.LiveService.FunctionApp.UserDetailsChange;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 
@@ -17,7 +16,6 @@ public class OrganisationService(
         RegulatorDetails regulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment,
-        string bearerToken,
         CancellationToken cancellationToken = default)
     {
         try
@@ -26,7 +24,6 @@ public class OrganisationService(
                 regulatorDetails,
                 hasRegulatorAccepted,
                 regulatorComment,
-                bearerToken,
                 cancellationToken);
         }
         catch (OperationCanceledException exception) when (cancellationToken.IsCancellationRequested)
@@ -63,7 +60,6 @@ public class OrganisationService(
         RegulatorDetails regulatorDetails,
         bool hasRegulatorAccepted,
         string regulatorComment,
-        string bearerToken,
         CancellationToken cancellationToken = default)
     {
         using var request = new HttpRequestMessage(
@@ -76,11 +72,6 @@ public class OrganisationService(
                         hasRegulatorAccepted
                     })
             };
-
-        request.Headers.Authorization =
-            new AuthenticationHeaderValue(
-                "Bearer",
-                RemoveBearerPrefix(bearerToken));
 
         request.Headers.Add(
             "X-EPR-User",
@@ -160,13 +151,4 @@ public class OrganisationService(
             "The organisation service encountered an error.",
         _ => "The organisation service request was unsuccessful."
     };
-
-    private static string RemoveBearerPrefix(string token)
-    {
-        const string prefix = "Bearer ";
-
-        return token.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-            ? token[prefix.Length..].Trim()
-            : token.Trim();
-    }
 }

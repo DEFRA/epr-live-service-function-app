@@ -16,7 +16,6 @@ namespace EPR.LiveService.FunctionApp.UnitTests.Services;
 public class OrganisationServiceWireMockTests
 {
     private const string ApprovalEndpoint = "api/regulators/regulator-organisation/approval/";
-    private const string BearerToken = "wiremock-bearer-token";
 
     [TestMethod]
     public async Task UpdateOrganisationAsync_WhenRequestIsAccepted_ReturnsAcceptedResponse()
@@ -41,8 +40,7 @@ public class OrganisationServiceWireMockTests
         var result = await CreateService(httpClient).UpdateOrganisationAsync(
             regulatorDetails,
             true,
-            regulatorComment,
-            BearerToken);
+            regulatorComment);
 
         result.HasUserDetailsChangeAccepted.Should().BeTrue();
         result.HasUserDetailsChangeRejected.Should().BeFalse();
@@ -68,8 +66,7 @@ public class OrganisationServiceWireMockTests
         var result = await CreateService(httpClient).UpdateOrganisationAsync(
             regulatorDetails,
             false,
-            regulatorComment,
-            BearerToken);
+            regulatorComment);
 
         result.HasUserDetailsChangeAccepted.Should().BeFalse();
         result.HasUserDetailsChangeRejected.Should().BeTrue();
@@ -111,8 +108,7 @@ public class OrganisationServiceWireMockTests
         var action = () => CreateService(httpClient).UpdateOrganisationAsync(
             regulatorDetails,
             true,
-            regulatorComment,
-            BearerToken);
+            regulatorComment);
 
         var exception = await action.Should().ThrowAsync<OrganisationServiceException>();
         exception.Which.StatusCode.Should().Be((HttpStatusCode)statusCode);
@@ -162,8 +158,7 @@ public class OrganisationServiceWireMockTests
         var action = () => CreateService(httpClient).UpdateOrganisationAsync(
             regulatorDetails,
             true,
-            regulatorComment,
-            BearerToken);
+            regulatorComment);
 
         var exception = await action.Should().ThrowAsync<OrganisationServiceException>();
         exception.Which.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -178,7 +173,6 @@ public class OrganisationServiceWireMockTests
         string regulatorComment) => Request.Create()
             .WithPath($"/{ApprovalEndpoint}{regulatorDetails.ChangeHistoryExternalId}")
             .UsingPost()
-            .WithHeader("Authorization", $"Bearer {BearerToken}")
             .WithHeader("X-EPR-User", regulatorDetails.XEprUser.ToString())
             .WithHeader("X-EPR-Organisation", regulatorDetails.XEprOrganisation.ToString())
             .WithBodyAsJson(new
