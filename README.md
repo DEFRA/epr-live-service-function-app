@@ -2,7 +2,8 @@
  
 An internal admin toolkit for the EPR (Extended Producer Responsibility) live service. Exposes a set of parameterised SQL queries as HTTP endpoints, each with an auto-generated HTML form and results rendered as an ASCII table (or CSV) — no separate frontend, no database client needed for common lookups.
 
- 
+
+
 Built as an Azure Function App
 
 ## How it works
