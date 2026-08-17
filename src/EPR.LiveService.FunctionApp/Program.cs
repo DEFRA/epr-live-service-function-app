@@ -10,6 +10,9 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Azure.Core.Diagnostics;
+
+using var listener = AzureEventSourceListener.CreateConsoleLogger();
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
