@@ -13,7 +13,7 @@ public class OrganisationServiceAuthorisationHandler : DelegatingHandler
 
     public OrganisationServiceAuthorisationHandler(ApiConfig config, TokenCredential credential)
     {
-        _tokenRequestContext = new TokenRequestContext([config.OrganisationServiceClientId]);
+        _tokenRequestContext = new TokenRequestContext([$"api://{config.OrganisationServiceClientId}/.default"]);
         _credential = credential;
     }
 
