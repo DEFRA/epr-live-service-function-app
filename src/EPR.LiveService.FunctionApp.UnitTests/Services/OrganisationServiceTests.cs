@@ -15,6 +15,47 @@ namespace EPR.LiveService.FunctionApp.UnitTests.Services;
 public class OrganisationServiceTests
 {
     [TestMethod]
+    public async Task UpdateOrganisationAsync_LogsJsonPayloadBeforeSendingRequest()
+    {
+        var logger = new RecordingLogger<OrganisationService>();
+        var service = CreateService((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
+        {
+            Content = new StringContent(
+                "{\"changeHistory\":{},\"hasUserDetailsChangeAccepted\":true,\"hasUserDetailsChangeRejected\":false}",
+                Encoding.UTF8,
+                "application/json")
+        }), logger);
+
+        await service.UpdateOrganisationAsync(CreateDetails(), true, "approved");
+
+        logger.Entries.Should().ContainSingle(entry =>
+            entry.Level == LogLevel.Information &&
+            entry.Message ==
+                "Sending organisation update JSON payload: {\"regulatorComment\":\"approved\",\"hasRegulatorAccepted\":true}");
+        logger.Entries.Should().ContainSingle(entry =>
+            entry.Level == LogLevel.Information &&
+            entry.Message ==
+                "Organisation update response with status 200: {\"changeHistory\":{},\"hasUserDetailsChangeAccepted\":true,\"hasUserDetailsChangeRejected\":false}");
+    }
+
+    [TestMethod]
+    public async Task UpdateOrganisationAsync_WhenRequestIsRejected_LogsResponseContent()
+    {
+        var logger = new RecordingLogger<OrganisationService>();
+        var service = CreateService((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)
+        {
+            Content = new StringContent("Invalid request")
+        }), logger);
+
+        var action = () => service.UpdateOrganisationAsync(CreateDetails(), true, string.Empty);
+
+        await action.Should().ThrowAsync<OrganisationServiceException>();
+        logger.Entries.Should().ContainSingle(entry =>
+            entry.Level == LogLevel.Information &&
+            entry.Message == "Organisation update response with status 400: Invalid request");
+    }
+
+    [TestMethod]
     public async Task UpdateOrganisationAsync_WhenRequestIsRejected_ThrowsExceptionWithStatusCode()
     {
         var service = CreateService((_, _) => Task.FromResult(new HttpResponseMessage(HttpStatusCode.BadRequest)
