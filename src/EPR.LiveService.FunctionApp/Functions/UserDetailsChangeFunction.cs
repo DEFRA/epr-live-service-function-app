@@ -36,6 +36,13 @@ public class UserDetailsChangeFunction(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-user-details")]
             HttpRequestData req, CancellationToken cancellationToken)
     {
+        using var diagClient = new HttpClient();
+        
+        diagClient.DefaultRequestHeaders.Add("X-IDENTITY-HEADER", Environment.GetEnvironmentVariable("IDENTITY_HEADER"));
+        var diagResponse = await diagClient.GetAsync($"{Environment.GetEnvironmentVariable("IDENTITY_ENDPOINT")}?api-version=2019-08-01&resource=api://1755c3c9-8ecb-4903-a61b-cc5cd81ec320");
+        var diagBody = await diagResponse.Content.ReadAsStringAsync();
+        Console.WriteLine($"[DIAG] MSI raw response: {(int)diagResponse.StatusCode} {diagBody}");
+        
         var userDetailsChangeRequest = await req.ReadFromJsonAsync<UserDetailsChangeRequest>();
         if (userDetailsChangeRequest is null)
         {
