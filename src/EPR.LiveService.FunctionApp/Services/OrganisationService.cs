@@ -2,7 +2,6 @@ using EPR.LiveService.FunctionApp.Configs;
 using EPR.LiveService.FunctionApp.UserDetailsChange;
 using Microsoft.Extensions.Logging;
 using System.Net;
-using System.Net.Http.Json;
 using System.Text.Json;
 
 namespace EPR.LiveService.FunctionApp.Services;
@@ -81,6 +80,11 @@ public class OrganisationService(
             "X-EPR-Organisation",
             regulatorDetails.XEprOrganisation.ToString());
 
+        var jsonPayload = await request.Content.ReadAsStringAsync(cancellationToken);
+        logger.LogInformation(
+            "Sending organisation update JSON payload: {JsonPayload}",
+            jsonPayload);
+
         HttpResponseMessage response;
 
         try
@@ -105,17 +109,22 @@ public class OrganisationService(
 
         using (response)
         {
+            var responseContent = await response.Content.ReadAsStringAsync(cancellationToken);
+            logger.LogInformation(
+                "Organisation update response with status {StatusCode}: {ResponseContent}",
+                (int)response.StatusCode,
+                responseContent);
+
             if (!response.IsSuccessStatusCode)
             {
-                await ThrowForUnsuccessfulResponseAsync(
-                    response,
-                    cancellationToken);
+                ThrowForUnsuccessfulResponse(response);
             }
 
             try
             {
-                return (await response.Content.ReadFromJsonAsync<OrganisationUpdateResponse>(
-                    cancellationToken: cancellationToken))
+                return JsonSerializer.Deserialize<OrganisationUpdateResponse>(
+                    responseContent,
+                    JsonSerializerOptions.Web)
                     ?? throw new JsonException("The response body was empty.");
             }
             catch (JsonException exception)
@@ -128,12 +137,8 @@ public class OrganisationService(
         }
     }
 
-    private static async Task ThrowForUnsuccessfulResponseAsync(
-        HttpResponseMessage response,
-        CancellationToken cancellationToken)
+    private static void ThrowForUnsuccessfulResponse(HttpResponseMessage response)
     {
-        _ = await response.Content.ReadAsStringAsync(cancellationToken);
-
         throw new OrganisationServiceException(
             GetFailureMessage(response.StatusCode),
             response.StatusCode);
