@@ -29,7 +29,7 @@ public class OrganisationServiceAuthorisationHandlerTests
         request.Headers.Authorization.Parameter.Should().Be("service-token");
         credential.CallCount.Should().Be(1);
         credential.RequestedScopes.Should().ContainSingle().Which.Should()
-            .Be($"api://{OrganisationServiceClientId}/.default");
+            .Be(OrganisationServiceClientId);
     }
 
     [TestMethod]
