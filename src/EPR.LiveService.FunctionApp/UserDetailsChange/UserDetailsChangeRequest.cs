@@ -4,6 +4,8 @@ namespace EPR.LiveService.FunctionApp.UserDetailsChange;
 
 public class UserDetailsChangeRequest
 {
+    private const int MaximumRegulatorCommentsLength = 180;
+
     public string? RegulatorEmail { get; set; }
 
     public string? UserEmail { get; set; }
@@ -36,6 +38,11 @@ public class UserDetailsChangeRequest
             && string.IsNullOrWhiteSpace(RegulatorComments))
         {
             errors.Add("RegulatorComments is required when RegulatorResponse is Rejected.");
+        }
+
+        if (RegulatorComments?.Length > MaximumRegulatorCommentsLength)
+        {
+            errors.Add($"RegulatorComments must be {MaximumRegulatorCommentsLength} characters or fewer.");
         }
 
         return errors;
