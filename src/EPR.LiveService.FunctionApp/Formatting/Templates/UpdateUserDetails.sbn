@@ -35,7 +35,7 @@
 
         <div id="regulator-comments-container"{{ if !rejected }} hidden{{ end }}>
             <label for="RegulatorComments">Regulator comments</label>
-            <textarea id="RegulatorComments" name="RegulatorComments" rows="5"{{ if rejected }} required{{ end }}>{{ regulator_comments | html.escape }}</textarea>
+            <textarea id="RegulatorComments" name="RegulatorComments" rows="5" maxlength="180"{{ if rejected }} required{{ end }}>{{ regulator_comments | html.escape }}</textarea>
         </div>
 
         <button class="submit-button" type="submit">Apply user details update</button>

@@ -46,6 +46,19 @@ public class UserDetailsChangeTests
     }
 
     [TestMethod]
+    public void RegulatorComments_ShouldBeLimitedTo180Characters()
+    {
+        var request = ValidRequest();
+        request.RegulatorComments = new string('a', 181);
+
+        request.Validate().Should().ContainSingle()
+            .Which.Should().Be("RegulatorComments must be 180 characters or fewer.");
+
+        request.RegulatorComments = new string('a', 180);
+        request.Validate().Should().BeEmpty();
+    }
+
+    [TestMethod]
     public void Form_ShouldCollectEveryRequiredParameter()
     {
         var html = UserDetailsChangePage.Build();
@@ -57,6 +70,7 @@ public class UserDetailsChangeTests
         html.Should().Contain("name=\"RegulatorResponse\" value=\"Accepted\"");
         html.Should().Contain("name=\"RegulatorResponse\" value=\"Rejected\"");
         html.Should().Contain("name=\"RegulatorComments\"");
+        html.Should().Contain("name=\"RegulatorComments\" rows=\"5\" maxlength=\"180\"");
         html.Should().Contain("fetch('/api/update-user-details'");
     }
 
