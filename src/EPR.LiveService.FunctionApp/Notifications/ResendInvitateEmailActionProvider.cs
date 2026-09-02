@@ -1,5 +1,4 @@
 using EPR.LiveService.FunctionApp.Formatting;
-using Microsoft.AspNetCore.WebUtilities;
 
 namespace EPR.LiveService.FunctionApp.Notifications;
 
@@ -27,18 +26,14 @@ public class ResendInvitateEmailActionProvider : IQueryResultActionProvider
             return [];
         }
 
-        var parameters = record
+        var fields = record
             .Where(field => FieldMappings.ContainsKey(field.Key) && field.Value is string)
-            .ToDictionary(
-                field => FieldMappings[field.Key],
-                field => (string?)field.Value,
-                StringComparer.OrdinalIgnoreCase);
-
+            .Select(field => new QueryResultActionField(FieldMappings[field.Key], (string)field.Value))
+            .ToList();
+        
         return
         [
-            new QueryResultAction(
-                "Re-send invitation email",
-                QueryHelpers.AddQueryString(ResendPath, parameters))
+            new QueryResultAction("Re-send invitation email", ResendPath, fields)
         ];
     }
 }

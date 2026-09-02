@@ -3,6 +3,8 @@ using EPR.LiveService.FunctionApp.Formatting;
 using EPR.LiveService.FunctionApp.Notifications;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
+using Microsoft.AspNetCore.WebUtilities;
+using Microsoft.Extensions.Primitives;
 
 namespace EPR.LiveService.FunctionApp.Functions;
 
@@ -11,20 +13,25 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     public const string TemplateId = "958280bf-e77e-4940-ba37-74340c02e44d";
 
     [Function("ResendInviteForm")]
-    [AuthorizeFunction(
-        Roles.Admin)]
+    [AuthorizeFunction(Roles.Admin)]
     public static async Task<HttpResponseData> ShowForm(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = "resend-invite-email")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = "resend-invite-email")] HttpRequestData req)
     {
+        var values = string.Equals(req.Method, "POST", StringComparison.OrdinalIgnoreCase)
+            ? await ReadFormValuesAsync(req)
+            : [];
+    
+        string? Get(string key) => values.TryGetValue(key, out var v) ? v.ToString() : null;
+    
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
         await response.WriteStringAsync(ResendInviteEmailPage.Build(new ResendInviteEmailRequest
         {
-            EmailAddress = req.Query.Get(nameof(ResendInviteEmailRequest.EmailAddress)),
-            OrganisationName = req.Query.Get(nameof(ResendInviteEmailRequest.OrganisationName)),
-            FirstName = req.Query.Get(nameof(ResendInviteEmailRequest.FirstName)),
-            LastName = req.Query.Get(nameof(ResendInviteEmailRequest.LastName)),
-            JoinTheTeamLink = req.Query.Get(nameof(ResendInviteEmailRequest.JoinTheTeamLink))
+            EmailAddress = Get(nameof(ResendInviteEmailRequest.EmailAddress)),
+            OrganisationName = Get(nameof(ResendInviteEmailRequest.OrganisationName)),
+            FirstName = Get(nameof(ResendInviteEmailRequest.FirstName)),
+            LastName = Get(nameof(ResendInviteEmailRequest.LastName)),
+            JoinTheTeamLink = Get(nameof(ResendInviteEmailRequest.JoinTheTeamLink))
         }));
         return response;
     }
@@ -59,6 +66,13 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
         return await WriteJsonAsync(
             req.CreateResponse(HttpStatusCode.OK),
             new { message = $"Email sent to {request.EmailAddress}." });
+    }
+
+    private static async Task<Dictionary<string, StringValues>> ReadFormValuesAsync(HttpRequestData req)
+    {
+        using var reader = new StreamReader(req.Body);
+        var body = await reader.ReadToEndAsync();
+        return QueryHelpers.ParseQuery(body); // same encoding as querystrings, works for x-www-form-urlencoded bodies
     }
 
     private static async Task<HttpResponseData> WriteJsonAsync(HttpResponseData response, object value)
