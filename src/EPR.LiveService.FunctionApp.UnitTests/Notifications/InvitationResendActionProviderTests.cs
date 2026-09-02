@@ -1,6 +1,6 @@
 using EPR.LiveService.FunctionApp.Notifications;
 using FluentAssertions;
-using Microsoft.AspNetCore.WebUtilities;
+using EPR.LiveService.FunctionApp.Formatting;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPR.LiveService.FunctionApp.UnitTests.Notifications;
@@ -24,16 +24,17 @@ public class InvitationResendActionProviderTests
 
         var action = _provider.GetActions("invitation_details", record)
             .Should().ContainSingle().Subject;
-        var uri = new Uri($"https://localhost{action.Url}");
-        var query = QueryHelpers.ParseQuery(uri.Query);
-
+        
         action.Label.Should().Be("Re-send invitation email");
-        uri.AbsolutePath.Should().Be("/api/resend-invite-email");
-        query["EmailAddress"].Should().ContainSingle("joe+invite@example.com");
-        query["OrganisationName"].Should().ContainSingle("Kell & Bloggs");
-        query["FirstName"].Should().ContainSingle("Joe");
-        query["LastName"].Should().ContainSingle("Bloggs");
-        query["JoinTheTeamLink"].Should().ContainSingle("https://example.com/join?a=1&b=2");
+        action.Url.Should().Be("/api/resend-invite-email");
+        action.Fields.Should().BeEquivalentTo(
+        [
+            new QueryResultActionField("EmailAddress", "joe+invite@example.com"),
+            new QueryResultActionField("OrganisationName", "Kell & Bloggs"),
+            new QueryResultActionField("FirstName", "Joe"),
+            new QueryResultActionField("LastName", "Bloggs"),
+            new QueryResultActionField("JoinTheTeamLink", "https://example.com/join?a=1&b=2")
+        ]);
     }
 
     [TestMethod]
@@ -45,6 +46,7 @@ public class InvitationResendActionProviderTests
             .Should().ContainSingle().Subject;
 
         action.Url.Should().Be("/api/resend-invite-email");
+        action.Fields.Should().BeEmpty();
     }
 
     [TestMethod]

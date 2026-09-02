@@ -25,7 +25,12 @@
 {{ if actions.size > 0 }}
 <div class="report-actions">
     {{ for action in actions }}
-    <a class="button-link" href="{{ action.url | html.escape }}">{{ action.label | html.escape }}</a>
+    <form class="action-form" method="post" action="{{ action.url | html.escape }}">
+        {{ for field in action.fields }}
+        <input type="hidden" name="{{ field.name | html.escape }}" value="{{ field.value | html.escape }}" />
+        {{ end }}
+        <button class="button-link" type="submit">{{ action.label | html.escape }}</button>
+    </form>
     {{ end }}
 </div>
 {{ end }}

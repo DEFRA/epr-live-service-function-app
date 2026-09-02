@@ -218,6 +218,17 @@ textarea {
     border-radius: 4px;
 }
 
+.action-form { display: inline-block; margin-right: 0.5rem; }
+button.button-link {
+    background: transparent;
+    color: #4ea1f3;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    margin-top: 0;
+}
+
 .table-scroll {
     overflow-x: auto;
     max-width: 100%;
