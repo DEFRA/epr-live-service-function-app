@@ -2,4 +2,8 @@ SELECT UserId, Email
 FROM dbo.Users
 WHERE
   (@MatchType = 'equals'   AND Email = @Email)
-  OR (@MatchType = 'contains' AND Email LIKE '%' + @Email + '%')
+  OR (
+    @MatchType = 'contains'
+    AND Email LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(@Email,
+      '\', '\\'), '%', '\%'), '_', '\_'), '[', '\[') + '%' ESCAPE '\'
+  )

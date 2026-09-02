@@ -71,6 +71,14 @@ public class RunQueryFunction
             return badOutput;
         }
 
+        if (!definition.Outputs.Contains(output))
+        {
+            var forbiddenOutput = req.CreateResponse(HttpStatusCode.BadRequest);
+            await forbiddenOutput.WriteStringAsync(
+                $"Output format '{outputKey}' is not supported for query '{queryId}'.");
+            return forbiddenOutput;
+        }
+
         using var connection = await _connectionFactory.CreateConnectionAsync(definition.Target);
         var sql = await _registry.LoadScriptAsync(queryId);
 
