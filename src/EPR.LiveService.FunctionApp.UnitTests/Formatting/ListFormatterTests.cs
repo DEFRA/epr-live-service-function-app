@@ -65,7 +65,7 @@ public class ListFormatterTests
 
         html.Should().Contain("class=\"button-link\"");
         html.Should().Contain("Re-send invitation");
-        html.Should().Contain("href=\"/api/resend?FirstName=Joe%20Bloggs\"");
+        html.Should().Contain("<form class=\"action-form\" method=\"post\" action=\"/api/resend?FirstName=Joe%20Bloggs\">");
     }
 
     [TestMethod]
