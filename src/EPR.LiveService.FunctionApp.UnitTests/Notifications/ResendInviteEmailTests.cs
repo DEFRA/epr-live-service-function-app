@@ -56,7 +56,8 @@ public class ResendInviteEmailTests
         html.Should().Contain("name=\"FirstName\"");
         html.Should().Contain("name=\"LastName\"");
         html.Should().Contain("name=\"JoinTheTeamLink\"");
-        html.Should().Contain("fetch('/api/resend-invite-email'");
+        html.Should().Contain("fetch('/api/resend-invite-email/send'");
+        html.Should().Contain("<form id=\"resend-form\" method=\"post\" action=\"/api/resend-invite-email\">");
     }
 
     [TestMethod]

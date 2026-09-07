@@ -98,6 +98,8 @@ public class RunQueryFunction
         var formatter = _serviceProvider.GetRequiredKeyedService<IQueryResultFormatter>(output);
 
         var response = req.CreateResponse(HttpStatusCode.OK);
+        response.Headers.Add("Cache-Control", "no-store");
+        response.Headers.Add("Referrer-Policy", "no-referrer");
         await formatter.WriteAsync(response, queryId, records);
         return response;
     }
