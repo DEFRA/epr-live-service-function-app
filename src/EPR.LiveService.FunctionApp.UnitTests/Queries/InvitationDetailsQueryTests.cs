@@ -34,6 +34,8 @@ public class InvitationDetailsQueryTests
         sql.Should().NotContain("jordan.rowe+pre2_non-ch@equalexperts.com");
         sql.Should().Contain("AS TemplateLink");
         sql.Should().Contain("AS InviteLink");
+        sql.Should().NotMatchRegex(@"(?m)^\s*u\.InviteToken\s*,");
+        sql.Should().Contain("https://report-packaging-data.defra.gov.uk/create-account/invitation/");
         sql.Should().Contain("ORDER BY e.EnrolmentStatusId");
     }
 }

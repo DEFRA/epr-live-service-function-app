@@ -39,9 +39,8 @@ SELECT
     org.ReferenceNumber AS OrgRef,
     es.[Name] AS EnrolmentStatus,
     e.EnrolmentStatusId,
-    u.InviteToken,
     CONCAT(
-        'http://report-packaging-data.defra.gov.uk/create-account/invitation/',
+        'https://report-packaging-data.defra.gov.uk/create-account/invitation/',
         REPLACE(u.InviteToken, '=', '%3D')
     ) AS InviteLink,
     e.IsDeleted AS EnrolmentDeleted,

@@ -25,6 +25,8 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
+        response.Headers.Add("Cache-Control", "no-store");
+        response.Headers.Add("Referrer-Policy", "no-referrer");
         await response.WriteStringAsync(ResendInviteEmailPage.Build(new ResendInviteEmailRequest
         {
             EmailAddress = Get(nameof(ResendInviteEmailRequest.EmailAddress)),
@@ -40,7 +42,7 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     [AuthorizeFunction(
         Roles.Admin)]
     public async Task<HttpResponseData> Send(
-        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resend-invite-email")] HttpRequestData req)
+        [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "resend-invite-email/send")] HttpRequestData req)
     {
         var request = await req.ReadFromJsonAsync<ResendInviteEmailRequest>();
         if (request is null)
@@ -72,7 +74,7 @@ public class ResendInviteEmailFunction(IEmailNotificationSender sender)
     {
         using var reader = new StreamReader(req.Body);
         var body = await reader.ReadToEndAsync();
-        return QueryHelpers.ParseQuery(body); // same encoding as querystrings, works for x-www-form-urlencoded bodies
+        return QueryHelpers.ParseQuery(body); // Decode form-urlencoded POST data; never read prefill from req.Query.
     }
 
     private static async Task<HttpResponseData> WriteJsonAsync(HttpResponseData response, object value)
