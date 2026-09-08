@@ -4,7 +4,7 @@
 
 Set `QueryResults__MaxRows` in the Function App's application settings to control
 the maximum number of rows returned by any query (for example, `250`). The default
-is `100` when omitted. For local development, add the same key under `Values` in
+is `1000` when omitted. For local development, add the same key under `Values` in
 `local.settings.json`.
 
 The setting is read at startup. After changing it in production, restart the
