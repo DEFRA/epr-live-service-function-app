@@ -15,15 +15,18 @@ public class RunQueryFunction
     private readonly IQueryRegistry _registry;
     private readonly ISqlConnectionFactory _connectionFactory;
     private readonly IServiceProvider _serviceProvider;
+    private readonly QueryResultLimit _resultLimit;
 
     public RunQueryFunction(
         IQueryRegistry registry,
         ISqlConnectionFactory connectionFactory,
-        IServiceProvider serviceProvider)
+        IServiceProvider serviceProvider,
+        QueryResultLimit resultLimit)
     {
         _registry = registry;
         _connectionFactory = connectionFactory;
         _serviceProvider = serviceProvider;
+        _resultLimit = resultLimit;
     }
 
     [Function("RunQuery")]
@@ -82,7 +85,19 @@ public class RunQueryFunction
         using var connection = await _connectionFactory.CreateConnectionAsync(definition.Target);
         var sql = await _registry.LoadScriptAsync(queryId);
 
-        var records = (await connection.QueryAsync(sql, parameters)).ToList();
+        List<dynamic> records;
+        using (var reader = await connection.ExecuteReaderAsync(_resultLimit.Apply(sql), parameters))
+        {
+            records = _resultLimit.Read(reader);
+        }
+
+        if (records.Count > _resultLimit.MaxRows)
+        {
+            var tooManyRows = req.CreateResponse(HttpStatusCode.BadRequest);
+            await tooManyRows.WriteStringAsync(
+                $"Query exceeds the limit of {_resultLimit.MaxRows} rows. Narrow your search and try again.");
+            return tooManyRows;
+        }
 
         if (records.Count == 0)
         {
