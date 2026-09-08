@@ -21,7 +21,8 @@ public class QueryDefinition
     public List<QueryParameterDefinition> Parameters { get; set; } = new();
 
     /// <summary>
-    /// The output formats this query supports. Drives which radio buttons the
+    /// The output formats this query supports, enforced by RunQueryFunction.
+    /// Drives which radio buttons the
     /// query form renders — if only one is declared, the form skips the radio
     /// group entirely and submits that format as a hidden field. Defaults to
     /// the standard multi-row formats when omitted from the .json definition.

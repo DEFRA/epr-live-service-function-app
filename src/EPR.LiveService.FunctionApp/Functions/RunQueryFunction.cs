@@ -82,7 +82,19 @@ public class RunQueryFunction
         using var connection = await _connectionFactory.CreateConnectionAsync(definition.Target);
         var sql = await _registry.LoadScriptAsync(queryId);
 
-        var records = (await connection.QueryAsync(sql, parameters)).ToList();
+        List<dynamic> records;
+        using (var reader = await connection.ExecuteReaderAsync(QueryResultLimit.Apply(sql), parameters))
+        {
+            records = QueryResultLimit.Read(reader);
+        }
+
+        if (records.Count > QueryResultLimit.MaxRows)
+        {
+            var tooManyRows = req.CreateResponse(HttpStatusCode.BadRequest);
+            await tooManyRows.WriteStringAsync(
+                $"Query exceeds the limit of {QueryResultLimit.MaxRows} rows. Narrow your search and try again.");
+            return tooManyRows;
+        }
 
         if (records.Count == 0)
         {
