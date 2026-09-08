@@ -10,6 +10,23 @@ namespace EPR.LiveService.FunctionApp.UnitTests.Formatting;
 public class TemplateRenderingTests
 {
     [TestMethod]
+    public void QueryFormPage_ShouldPinCdnScriptWithIntegrityAndAnonymousCors()
+    {
+        var html = QueryFormPage.Build(new QueryDefinition
+        {
+            Id = "user_lookup",
+            DisplayName = "User lookup",
+            Description = "Find a user"
+        });
+
+        // Keep the URL and hash paired when upgrading List.js.
+        html.Should().MatchRegex(
+            "<script\\s+src=\"https://cdnjs\\.cloudflare\\.com/ajax/libs/list\\.js/2\\.3\\.1/list\\.min\\.js\"" +
+            "\\s+integrity=\"sha512-93wYgwrIFL\\+b\\+P3RvYxi/WUFRXXUDSLCT2JQk9zhVGXuS2mHl2axj6d\\+R6pP\\+gcU5isMHRj1u0oYE/mWyt/RjA==\"" +
+            "\\s+crossorigin=\"anonymous\"></script>");
+    }
+
+    [TestMethod]
     public void QueryFormPage_ShouldRenderSharedStylesPartial()
     {
         var definition = new QueryDefinition
