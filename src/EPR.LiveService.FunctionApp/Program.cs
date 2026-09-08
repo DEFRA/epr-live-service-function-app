@@ -48,6 +48,7 @@ builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
 builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
 builder.Services.AddSingleton<IClientPrincipalDecoder, ClientPrincipalDecoder>();
 builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
+builder.Services.AddSingleton<QueryResultLimit>();
 builder.Services.AddSingleton<IEmailNotificationSender, GovUkNotifyEmailSender>();
 builder.Services.AddSingleton<IQueryResultActionProvider, ResendInvitateEmailActionProvider>();
 
@@ -61,6 +62,8 @@ builder.Services.AddKeyedSingleton<IQueryResultFormatter, ListFormatter>(QueryOu
 
 var app = builder.Build();
 _ = app.Services.GetRequiredService<IQueryRegistry>();
+// Validate the configured row limit before accepting requests.
+_ = app.Services.GetRequiredService<QueryResultLimit>();
 
 // Fail fast at startup if a QueryOutputFormat is missing its keyed registration
 // above, rather than only discovering the gap on the first request for that
