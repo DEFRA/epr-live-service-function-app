@@ -9,7 +9,7 @@ using System.Reflection;
 
 namespace EPR.LiveService.FunctionApp.Middleware;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "Isolated-worker middleware — needs a full FunctionContext/FunctionExecutionDelegate pipeline to exercise meaningfully; not unit-testable without a Functions host.")]
 public sealed class FunctionAuthorizationMiddleware(
     ILogger<FunctionAuthorizationMiddleware> logger) : IFunctionsWorkerMiddleware
 {

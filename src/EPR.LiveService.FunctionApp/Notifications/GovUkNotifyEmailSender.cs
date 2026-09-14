@@ -4,7 +4,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace EPR.LiveService.FunctionApp.Notifications;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "SendAsync makes a real outbound call via the GOV.UK Notify SDK client, constructed inline rather than injected — not mockable without a network call or a wrapping interface.")]
 public class GovUkNotifyEmailSender : IEmailNotificationSender
 {
     private readonly string? _apiKey;

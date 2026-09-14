@@ -22,7 +22,6 @@ var builder = FunctionsApplication.CreateBuilder(args);
 builder.ConfigureFunctionsWebApplication();
 
 builder.UseMiddleware<FunctionAuthorizationMiddleware>();
-builder.UseMiddleware<AuthClaimsLoggingMiddleware>();
 
 if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("APPLICATIONINSIGHTS_CONNECTION_STRING")))
 {
@@ -46,7 +45,6 @@ builder.Services.Configure<Dictionary<string, SqlTargetOptions>>(
     builder.Configuration.GetSection("SqlTargets"));
 
 builder.Services.AddSingleton<ISqlConnectionFactory, SqlConnectionFactory>();
-builder.Services.AddSingleton<IClientPrincipalDecoder, ClientPrincipalDecoder>();
 builder.Services.AddSingleton<IQueryRegistry, QueryRegistry>();
 builder.Services.AddSingleton<QueryResultLimit>();
 builder.Services.AddSingleton<IEmailNotificationSender, GovUkNotifyEmailSender>();
