@@ -10,12 +10,6 @@ using Microsoft.Azure.Functions.Worker.Builder;
 using Microsoft.Azure.Functions.Worker.OpenTelemetry;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Azure.Core.Diagnostics;
-
-using var listener = AzureEventSourceListener.CreateConsoleLogger();
-var identityEndpoint = Environment.GetEnvironmentVariable("IDENTITY_ENDPOINT");
-var identityHeaderPresent = !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("IDENTITY_HEADER"));
-Console.WriteLine($"[DIAG] IDENTITY_ENDPOINT={identityEndpoint}, IDENTITY_HEADER present={identityHeaderPresent}");
 
 var builder = FunctionsApplication.CreateBuilder(args);
 
