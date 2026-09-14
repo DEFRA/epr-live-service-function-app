@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Net;
 using Dapper;
 using EPR.LiveService.FunctionApp.Formatting;
@@ -52,7 +51,7 @@ public class RunQueryFunction
         DynamicParameters parameters;
         try
         {
-            parameters = BuildParameters(definition, req.Query);
+            parameters = QueryParameterBinder.Build(definition, req.Query);
         }
         catch (ArgumentException ex)
         {
@@ -117,37 +116,5 @@ public class RunQueryFunction
         response.Headers.Add("Referrer-Policy", "no-referrer");
         await formatter.WriteAsync(response, queryId, records);
         return response;
-    }
-
-    private static DynamicParameters BuildParameters(QueryDefinition definition, System.Collections.Specialized.NameValueCollection query)
-    {
-        var parameters = new DynamicParameters();
-
-        foreach (var paramDef in definition.Parameters)
-        {
-            var raw = query.Get(paramDef.Name);
-
-            if (string.IsNullOrEmpty(raw))
-            {
-                if (paramDef.Required)
-                {
-                    throw new ArgumentException($"Missing required parameter '{paramDef.Name}'");
-                }
-
-                parameters.Add(paramDef.Name, null);
-                continue;
-            }
-
-            object typedValue = paramDef.Type switch
-            {
-                "number" => decimal.Parse(raw),
-                "date" => DateTime.Parse(raw, CultureInfo.InvariantCulture),
-                _ => raw
-            };
-
-            parameters.Add(paramDef.Name, typedValue);
-        }
-
-        return parameters;
     }
 }

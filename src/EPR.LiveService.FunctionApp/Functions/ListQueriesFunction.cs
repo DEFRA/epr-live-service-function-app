@@ -21,21 +21,7 @@ public class ListQueriesFunction
     {
         var response = req.CreateResponse(HttpStatusCode.OK);
         response.Headers.Add("Content-Type", "text/html; charset=utf-8");
-        await response.WriteStringAsync(Build(_registry.All()));
+        await response.WriteStringAsync(ListQueriesPage.Build(_registry.All()));
         return response;
-    }
-
-    private static string Build(IEnumerable<QueryDefinition> definitions)
-    {
-        ArgumentNullException.ThrowIfNull(definitions);
-
-        var model = new
-        {
-            Definitions = definitions
-                .OrderBy(definition => definition.DisplayName)
-                .ToArray()
-        };
-
-        return TemplateRenderer.Render("ListQueries.sbn", model);
     }
 }
