@@ -8,7 +8,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace FacadeAccountCreation.API.Extensions;
 
-[ExcludeFromCodeCoverage]
+[ExcludeFromCodeCoverage(Justification = "DI composition helper — registers services/HttpClients; there's no behaviour here beyond wiring, so a test would only assert registration counts.")]
 public static class HttpClientServiceCollectionExtension
 {
     public static IServiceCollection AddServicesAndHttpClients(this IServiceCollection services)

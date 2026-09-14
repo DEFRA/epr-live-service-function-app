@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using CsvHelper;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -11,6 +12,7 @@ namespace EPR.LiveService.FunctionApp.Formatting;
 /// </summary>
 public class CsvFormatter : IQueryResultFormatter
 {
+    [ExcludeFromCodeCoverage(Justification = "Writes CSV straight to HttpResponseData.Body via CsvHelper — no pure logic separable from the HTTP response, unlike the other IQueryResultFormatter implementations.")]
     public async Task WriteAsync(HttpResponseData response, string queryId, IEnumerable<dynamic> records)
     {
         response.Headers.Add("Content-Type", "text/csv; charset=utf-8");
