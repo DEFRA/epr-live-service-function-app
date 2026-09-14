@@ -1,5 +1,6 @@
 using System.Dynamic;
 using EPR.LiveService.FunctionApp.Formatting;
+using EPR.LiveService.FunctionApp.UnitTests.TestSupport.Http;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -94,4 +95,28 @@ public class ListFormatterTests
         act.Should().Throw<ArgumentException>()
             .WithMessage("*exactly one record*received 2*");
     }
+
+    [TestMethod]
+    public async Task WriteAsync_ShouldIncludeActionsFromAllRegisteredProviders()
+    {
+        var formatter = new ListFormatter(
+        [
+            new FakeActionProvider(new QueryResultAction("Re-send invitation", "/a")),
+            new FakeActionProvider(new QueryResultAction("Archive", "/b"))
+        ]);
+        dynamic row = new ExpandoObject();
+        row.Name = "Joe";
+        var response = TestHttpResponseData.Create(new TestFunctionContext());
+    
+        await formatter.WriteAsync(response, "user_lookup", new[] { row });
+    
+        var html = response.ReadBodyAsString();
+        html.Should().Contain("Re-send invitation");
+        html.Should().Contain("Archive");
+    }
+}
+    
+file sealed class FakeActionProvider(params QueryResultAction[] actions) : IQueryResultActionProvider
+{
+    public IEnumerable<QueryResultAction> GetActions(string queryId, IReadOnlyDictionary<string, object> record) => actions;
 }

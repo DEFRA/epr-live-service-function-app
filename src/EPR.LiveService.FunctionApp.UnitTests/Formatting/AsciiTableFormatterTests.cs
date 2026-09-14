@@ -1,5 +1,6 @@
 using System.Dynamic;
 using EPR.LiveService.FunctionApp.Formatting;
+using EPR.LiveService.FunctionApp.UnitTests.TestSupport.Http;
 using FluentAssertions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -72,5 +73,19 @@ public class AsciiTableFormatterTests
         // fit the value rather than the value being clipped to the header.
         lines.Select(line => line.Length).Distinct().Should().HaveCount(1);
         table.Should().Contain("A very long value here");
+    }
+
+    [TestMethod]
+    public async Task WriteAsync_ShouldWriteAsciiTableWrappedAsHtmlFragment()
+    {
+        dynamic row = new ExpandoObject();
+        row.Name = "Joe";
+        var response = TestHttpResponseData.Create(new TestFunctionContext());
+    
+        await new AsciiTableFormatter().WriteAsync(response, "user_lookup", new[] { row });
+    
+        var html = response.ReadBodyAsString();
+        html.Should().Contain("<pre>");
+        html.Should().Contain("Joe");
     }
 }

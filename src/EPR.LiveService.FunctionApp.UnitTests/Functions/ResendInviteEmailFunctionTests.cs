@@ -65,6 +65,32 @@ public class ResendInviteEmailFunctionTests
             email.EmailAddress == "joe.bloggs@company.com"
             && email.TemplateId == ResendInviteEmailFunction.TemplateId);
     }
+
+    [TestMethod]
+    public async Task ShowForm_WithGetRequest_ShouldRenderEmptyForm()
+    {
+        var request = TestHttpRequestData.Get("/api/resend-invite-email");
+    
+        var response = await ResendInviteEmailFunction.ShowForm(request);
+    
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.ReadBodyAsString().Should().Contain("<form");
+    }
+    
+    [TestMethod]
+    public async Task ShowForm_WithPostRequest_ShouldPrefillFieldsFromFormBody()
+    {
+        var request = TestHttpRequestData.PostForm(
+            "/api/resend-invite-email",
+            "EmailAddress=joe.bloggs%40company.com&OrganisationName=Kellbloggs&FirstName=Joe&LastName=Bloggs&JoinTheTeamLink=https%3A%2F%2Fexample.gov.uk%2Fjoin");
+    
+        var response = await ResendInviteEmailFunction.ShowForm(request);
+    
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        var html = response.ReadBodyAsString();
+        html.Should().Contain("joe.bloggs@company.com");
+        html.Should().Contain("Kellbloggs");
+    }
 }
 
 file sealed class FakeEmailNotificationSender : IEmailNotificationSender
