@@ -3,7 +3,6 @@ using EPR.LiveService.FunctionApp.Functions;
 using EPR.LiveService.FunctionApp.UnitTests.TestSupport.Fakes;
 using EPR.LiveService.FunctionApp.UnitTests.TestSupport.Http;
 using FluentAssertions;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace EPR.LiveService.FunctionApp.UnitTests.Functions;
@@ -14,8 +13,7 @@ public class UserDetailsChangeFunctionTests
     private static UserDetailsChangeFunction CreateFunction() =>
         new(
             new UnreachableSqlConnectionFactory(),
-            new UnreachableOrganisationService(),
-            NullLogger<UserDetailsChangeFunction>.Instance); // IsEnabled(Trace) is always false — skips the MSI diagnostic block
+            new UnreachableOrganisationService());
 
     [TestMethod]
     public async Task ShowForm_ShouldPrefillFieldsFromQueryString()

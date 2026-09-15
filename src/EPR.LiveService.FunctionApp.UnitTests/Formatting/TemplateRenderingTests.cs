@@ -182,4 +182,61 @@ public class TemplateRenderingTests
 
         html.Should().Be("<pre>&lt;unsafe&gt;</pre>");
     }
+
+    [TestMethod]
+    public void Render_WithUnknownTemplateName_ShouldThrowFileNotFoundException()
+    {
+        var act = () => TemplateRenderer.Render("DoesNotExist.sbn", new { });
+    
+        act.Should().Throw<FileNotFoundException>().WithMessage("*DoesNotExist.sbn*");
+    }
+    
+    [TestMethod]
+    public void QueryFormPage_WithSelectParameter_ShouldRenderRadioOptionsWithFirstChecked()
+    {
+        var definition = new QueryDefinition
+        {
+            Id = "organisation_details",
+            DisplayName = "Organisation details",
+            Description = "Find an organisation",
+            Parameters =
+            [
+                new QueryParameterDefinition
+                {
+                    Name = "Nation",
+                    Label = "Nation",
+                    Type = "select",
+                    Options =
+                    [
+                        new SelectOption { Value = "england", Label = "England" },
+                        new SelectOption { Value = "wales", Label = "Wales" }
+                    ]
+                }
+            ]
+        };
+    
+        var html = QueryFormPage.Build(definition);
+    
+        html.Should().Contain("<legend>Nation</legend>");
+        html.Should().Contain("value=\"england\" checked");
+        html.Should().Contain("value=\"wales\"");
+        html.Should().Contain("England");
+        html.Should().Contain("Wales");
+    }
+    
+    [TestMethod]
+    public void QueryFormPage_WithDateParameter_ShouldRenderDateInput()
+    {
+        var definition = new QueryDefinition
+        {
+            Id = "organisation_details",
+            DisplayName = "Organisation details",
+            Description = "Find an organisation",
+            Parameters = [new QueryParameterDefinition { Name = "SubmittedFrom", Label = "Submitted from", Type = "date" }]
+        };
+    
+        var html = QueryFormPage.Build(definition);
+    
+        html.Should().Contain("type=\"date\"");
+    }
 }

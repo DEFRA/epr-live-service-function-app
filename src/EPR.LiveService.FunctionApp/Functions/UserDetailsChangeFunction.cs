@@ -6,14 +6,12 @@ using EPR.LiveService.FunctionApp.Services;
 using EPR.LiveService.FunctionApp.Sql;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
-using Microsoft.Extensions.Logging;
 
 namespace EPR.LiveService.FunctionApp.Functions;
 
 public class UserDetailsChangeFunction(
     ISqlConnectionFactory connectionFactory,
-    IOrganisationService organisationService,
-    ILogger<UserDetailsChangeFunction> logger)
+    IOrganisationService organisationService)
     {
 
     [Function("UserDetailsChangeForm")]
@@ -37,22 +35,7 @@ public class UserDetailsChangeFunction(
     public async Task<HttpResponseData> RunQuery(
         [HttpTrigger(AuthorizationLevel.Anonymous, "post", Route = "update-user-details")]
             HttpRequestData req, CancellationToken cancellationToken)
-    {
-       if (logger.IsEnabled(LogLevel.Trace))
-        {
-            using var diagClient = new HttpClient();
-
-            diagClient.DefaultRequestHeaders.Add("X-IDENTITY-HEADER", Environment.GetEnvironmentVariable("IDENTITY_HEADER"));
-            var diagResponse = await diagClient.GetAsync($"{Environment.GetEnvironmentVariable("IDENTITY_ENDPOINT")}?api-version=2019-08-01&resource=api://1755c3c9-8ecb-4903-a61b-cc5cd81ec320");
-
-            var diagBody = await diagResponse.Content.ReadAsStringAsync(cancellationToken);
-
-            logger.LogTrace(
-                "MSI raw response: {StatusCode} {ResponseBody}",
-                (int)diagResponse.StatusCode,
-                diagBody);
-        }
-        
+    {   
         var userDetailsChangeRequest = await req.ReadFromJsonAsync<UserDetailsChangeRequest>();
         if (userDetailsChangeRequest is null)
         {
