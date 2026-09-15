@@ -14,6 +14,8 @@ public class UserDetailsChangeFunction(
     IOrganisationService organisationService)
     {
 
+    private static readonly string RegulatorDetailsSql = LoadEmbeddedSql("RegulatorDetails.sql");
+
     [Function("UserDetailsChangeForm")]
     [AuthorizeFunction(Roles.Admin)]
     public static async Task<HttpResponseData> ShowForm(
@@ -52,51 +54,8 @@ public class UserDetailsChangeFunction(
                 new { errors });
         }
 
-        string regulatorDetailsSql = """
-            WITH RegulatorDetails AS
-            (
-                SELECT
-                    u.UserId AS XEprUser,
-                    o.ExternalId AS XEprOrganisation
-                FROM dbo.Users u
-                INNER JOIN dbo.Persons p ON p.UserId = u.Id
-                INNER JOIN dbo.PersonOrganisationConnections poc ON poc.PersonId = p.Id
-                INNER JOIN dbo.Organisations o ON o.Id = poc.OrganisationId
-                WHERE u.Email = @RegulatorEmail
-                  AND u.IsDeleted = 0
-                  AND o.IsDeleted = 0
-                  AND poc.IsDeleted = 0
-            ),
-            LatestChangeHistory AS
-            (
-                SELECT TOP (1)
-                    ch.ExternalId AS ChangeHistoryExternalId
-                FROM dbo.Users u
-                INNER JOIN dbo.Persons p ON p.UserId = u.Id
-                INNER JOIN dbo.PersonOrganisationConnections poc ON poc.PersonId = p.Id
-                INNER JOIN dbo.Organisations o ON o.Id = poc.OrganisationId
-                INNER JOIN dbo.ChangeHistory ch
-                    ON ch.PersonId = p.Id
-                    AND ch.OrganisationId = o.Id
-                WHERE u.Email = @UserEmail
-                  AND o.ReferenceNumber = @UserOrganisationId
-                  AND ch.IsActive = 1
-                  AND ch.DecisionDate IS NULL
-                  AND ch.IsDeleted = 0
-                  AND o.IsDeleted = 0
-                  AND poc.IsDeleted = 0
-                ORDER BY ch.DeclarationDate DESC
-            )
-            SELECT
-                regulator.XEprUser,
-                regulator.XEprOrganisation,
-                changeHistory.ChangeHistoryExternalId
-            FROM RegulatorDetails regulator
-            CROSS JOIN LatestChangeHistory changeHistory;
-            """;
-
         using var connection = await connectionFactory.CreateConnectionAsync("accounts");
-        var regulatorDetails = await connection.QueryFirstOrDefaultAsync<RegulatorDetails>(regulatorDetailsSql, userDetailsChangeRequest);
+        var regulatorDetails = await connection.QueryFirstOrDefaultAsync<RegulatorDetails>(RegulatorDetailsSql, userDetailsChangeRequest);
 
         if (regulatorDetails is null)
         {
@@ -122,6 +81,17 @@ public class UserDetailsChangeFunction(
                 regulatorDetails.ChangeHistoryExternalId,
                 UpdateOrganisationResult = updateOrganisationResult
             });
+    }
+
+    private static string LoadEmbeddedSql(string fileName)
+    {
+        var assembly = typeof(UserDetailsChangeFunction).Assembly;
+        var resourceName = $"{assembly.GetName().Name}.UserDetailsChange.Sql.{fileName}";
+    
+        using var stream = assembly.GetManifestResourceStream(resourceName)
+            ?? throw new FileNotFoundException($"SQL resource '{resourceName}' not found.");
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
     }
 
     private static async Task<HttpResponseData> WriteJsonAsync(HttpResponseData response, object value)
