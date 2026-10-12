@@ -1,9 +1,12 @@
 {
   "id": "organisation_details",
   "displayName": "Organisations Details",
-  "description": "For a given Reference Number, returns Organisation and associated Persons details",
-  "target": "accounts", 
+  "description": "Returns Organisation and associated Persons details. Search by any combination of Reference Number, Companies House number, organisation name (partial match) or person email (partial match) - at least one must be supplied.",
+  "target": "accounts",
   "parameters": [
-    { "name": "ReferenceNumber", "label": "ReferenceNumber", "type": "text", "required": true }
+    { "name": "ReferenceNumber", "label": "Reference Number", "type": "text", "required": false },
+    { "name": "CompaniesHouseNumber", "label": "Companies House number", "type": "text", "required": false },
+    { "name": "Name", "label": "Organisation name (contains)", "type": "text", "required": false },
+    { "name": "Email", "label": "Email (contains)", "type": "text", "required": false }
   ]
 }
