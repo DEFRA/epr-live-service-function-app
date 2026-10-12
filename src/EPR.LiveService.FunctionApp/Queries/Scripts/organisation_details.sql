@@ -1,3 +1,7 @@
+-- All search parameters are optional; any supplied are combined with AND.
+-- Name and Email match any part of the value (LIKE wildcards in the input are
+-- escaped so they are treated literally). If no parameter is supplied the
+-- query returns no rows rather than every organisation.
 SELECT 
   p.Id as PersonId,
   p.FirstName,
@@ -7,6 +11,7 @@ SELECT
   pocs.Id  AS PersonOC_Id,
   org.Id AS OrganisationId,
   org.ReferenceNumber,
+  org.CompaniesHouseNumber,
   org.ExternalId As OrgExternalId,
   org.Name,
   nat.Name AS Nation,
@@ -33,5 +38,19 @@ FROM [Persons] p
   INNER JOIN Users u ON u.Id = p.UserId
   INNER JOIN Nations nat ON nat.Id = org.NationId
 WHERE
-  org.ReferenceNumber = @ReferenceNumber
-ORDER BY org.Name;
+  (@ReferenceNumber IS NULL OR org.ReferenceNumber = @ReferenceNumber)
+  AND (@CompaniesHouseNumber IS NULL OR org.CompaniesHouseNumber = @CompaniesHouseNumber)
+  AND (
+    @Name IS NULL
+    OR org.Name LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(@Name,
+      '\', '\\'), '%', '\%'), '_', '\_'), '[', '\[') + '%' ESCAPE '\'
+  )
+  AND (
+    @Email IS NULL
+    OR p.Email LIKE '%' + REPLACE(REPLACE(REPLACE(REPLACE(@Email,
+      '\', '\\'), '%', '\%'), '_', '\_'), '[', '\[') + '%' ESCAPE '\'
+  )
+  -- guard: refuse to run with nothing filled in
+  AND (@ReferenceNumber IS NOT NULL OR @CompaniesHouseNumber IS NOT NULL OR @Name IS NOT NULL OR @Email IS NOT NULL)
+ORDER BY org.Name
+OPTION (RECOMPILE);
