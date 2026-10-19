@@ -1,5 +1,5 @@
 variables:
-  azureSubscription: 'AZD-RWD-PRE1'
+  azureSubscription: 'AZR-RWD-PRE1'
   docker.imageName: 'eprliveservicefunctionapp'
   acr.azureContainerRegistryName: 'prerwdinfac1401'
   acr.repositoryName: 'eprliveservicefunctionapprepository'
