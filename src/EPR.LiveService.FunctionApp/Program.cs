@@ -32,6 +32,10 @@ builder.Services.AddSingleton(
     ApiEndpoint.FromConfiguration(
         builder.Configuration.GetSection(ApiEndpoint.SectionName)));
 
+builder.Services.AddSingleton(
+    AuthorisationConfig.FromConfiguration(
+        builder.Configuration.GetSection(AuthorisationConfig.SectionName)));
+
 // Services & HttpClients
 builder.Services.AddServicesAndHttpClients();
 

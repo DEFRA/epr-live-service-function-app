@@ -1,4 +1,5 @@
-using EPR.LiveService.FunctionApp.Authorisation;
+using EPR.LiveService.FunctionApp.Configs;
+using EPR.LiveService.FunctionApp.Extensions;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
 using Microsoft.Azure.Functions.Worker.Middleware;
@@ -6,12 +7,14 @@ using Microsoft.Extensions.Logging;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Reflection;
+using System.Security.Claims;
 
 namespace EPR.LiveService.FunctionApp.Middleware;
 
 [ExcludeFromCodeCoverage(Justification = "Isolated-worker middleware — needs a full FunctionContext/FunctionExecutionDelegate pipeline to exercise meaningfully; not unit-testable without a Functions host.")]
 public sealed class FunctionAuthorizationMiddleware(
-    ILogger<FunctionAuthorizationMiddleware> logger) : IFunctionsWorkerMiddleware
+    ILogger<FunctionAuthorizationMiddleware> logger,
+    AuthorisationConfig authorisationConfig) : IFunctionsWorkerMiddleware
 {
     public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
     {
@@ -45,12 +48,17 @@ public sealed class FunctionAuthorizationMiddleware(
             return;
         }
 
-        if (!attribute.IsAuthorized(principal))
+        if (!attribute.IsAuthorized(principal, authorisationConfig.TenantId))
         {
             logger.LogWarning(
-                "Request rejected because its tenant, object identifier, or roles " +
-                "do not satisfy the authorization requirements for function {FunctionName}.",
-                context.FunctionDefinition.Name);
+                "Authorization failed for {FunctionName}. TokenTenant={TokenTenant} ExpectedTenant={ExpectedTenant} HasObjectId={HasObjectId} Roles={Roles}",
+                context.FunctionDefinition.Name,
+                principal.GetTenantId(),
+                authorisationConfig.TenantId,
+                !string.IsNullOrWhiteSpace(principal.GetObjectId()),
+                string.Join(",", principal.Claims
+                    .Where(c => c.Type is "roles" or "role" or ClaimTypes.Role)
+                    .Select(c => c.Value)));
 
             context.GetInvocationResult().Value =
                 request.CreateResponse(HttpStatusCode.Forbidden);

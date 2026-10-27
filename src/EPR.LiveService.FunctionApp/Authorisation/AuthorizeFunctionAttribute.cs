@@ -8,15 +8,15 @@ public sealed class AuthorizeFunctionAttribute(params string[] roles) : Attribut
 {
     public IReadOnlyCollection<string> Roles { get; } = Array.AsReadOnly(roles);
 
-    public bool IsAuthorized(ClaimsPrincipal principal)
-    {
-        return principal.Identity?.IsAuthenticated == true
-            && string.Equals(
-                principal.GetTenantId(),
-                AuthorisationConstants.ExpectedTenantId,
-                StringComparison.OrdinalIgnoreCase)
-            && !string.IsNullOrWhiteSpace(principal.GetObjectId())
-            && Roles.Count > 0
-            && Roles.Any(principal.HasRole);
-    }
+    public bool IsAuthorized(ClaimsPrincipal principal, string expectedTenantId)
+{
+    return principal.Identity?.IsAuthenticated == true
+        && string.Equals(
+            principal.GetTenantId(),
+            expectedTenantId,
+            StringComparison.OrdinalIgnoreCase)
+        && !string.IsNullOrWhiteSpace(principal.GetObjectId())
+        && Roles.Count > 0
+        && Roles.Any(principal.HasRole);
+}
 }
