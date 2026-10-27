@@ -8,6 +8,7 @@ namespace EPR.LiveService.FunctionApp.UnitTests.Authorisation;
 [TestClass]
 public sealed class AuthorizeFunctionAttributeTests
 {
+    private const string TenantId = "6f504113-6b64-43f2-ade9-242e05780007";
     private readonly AuthorizeFunctionAttribute _attribute =
         new(Roles.User, Roles.Admin);
 
@@ -18,7 +19,7 @@ public sealed class AuthorizeFunctionAttributeTests
     {
         var principal = CreatePrincipal(new Claim("roles", role));
 
-        _attribute.IsAuthorized(principal).Should().BeTrue();
+        _attribute.IsAuthorized(principal, TenantId).Should().BeTrue();
     }
 
     [TestMethod]
@@ -26,7 +27,7 @@ public sealed class AuthorizeFunctionAttributeTests
     {
         var principal = CreatePrincipal(new Claim("roles", "reader"));
 
-        _attribute.IsAuthorized(principal).Should().BeFalse();
+        _attribute.IsAuthorized(principal, TenantId).Should().BeFalse();
     }
 
     [TestMethod]
@@ -36,7 +37,7 @@ public sealed class AuthorizeFunctionAttributeTests
             new Claim("roles", Roles.User),
             new Claim("tid", "another-tenant"));
 
-        _attribute.IsAuthorized(principal).Should().BeFalse();
+        _attribute.IsAuthorized(principal, TenantId).Should().BeFalse();
     }
 
     [TestMethod]
@@ -46,7 +47,7 @@ public sealed class AuthorizeFunctionAttributeTests
             new Claim("roles", Roles.User),
             new Claim("oid", string.Empty));
 
-        _attribute.IsAuthorized(principal).Should().BeFalse();
+        _attribute.IsAuthorized(principal, TenantId).Should().BeFalse();
     }
 
     [TestMethod]
@@ -55,7 +56,7 @@ public sealed class AuthorizeFunctionAttributeTests
         var principal = new ClaimsPrincipal(
             new ClaimsIdentity([new Claim("roles", Roles.User)]));
 
-        _attribute.IsAuthorized(principal).Should().BeFalse();
+        _attribute.IsAuthorized(principal, TenantId).Should().BeFalse();
     }
 
     private static ClaimsPrincipal CreatePrincipal(params Claim[] claims)
@@ -65,7 +66,7 @@ public sealed class AuthorizeFunctionAttributeTests
         if (!allClaims.Any(claim => claim.Type == "tid"))
         {
             allClaims.Add(
-                new Claim("tid", AuthorisationConstants.ExpectedTenantId));
+                new Claim("tid", TenantId));
         }
 
         if (!allClaims.Any(claim => claim.Type == "oid"))
