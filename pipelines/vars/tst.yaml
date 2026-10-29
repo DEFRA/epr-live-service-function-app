@@ -1,6 +1,12 @@
 variables:
-  azureSubscription: 'AZD-RWD-TST1'
-  docker.imageName: 'eprliveservicefunctionapp'
-  acr.azureContainerRegistryName: 'tstrwdinfac1401'
-  acr.repositoryName: 'eprliveservicefunctionapprepository'
-  serviceName: 'TSTRWDWEBFA1480'
+- group: ServiceConnections
+- name: azureSubscription
+  value: $(ServiceConnectionTST1)
+- name: docker.imageName
+  value: 'eprliveservicefunctionapp'
+- name: acr.azureContainerRegistryName
+  value: 'tstrwdinfac1401'
+- name: acr.repositoryName
+  value: 'eprliveservicefunctionapprepository'
+- name: serviceName
+  value: 'TSTRWDWEBFA1480'
