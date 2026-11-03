@@ -10,13 +10,8 @@ parameters:
   default: 'DEV8'
   type: string
   values:
-    - DEV2
-    - DEV3
-    - DEV7
+    - DEV4
     - DEV8
-    - DEV9
-    - DEV14
-    - DEV15
 - name: envToDeploy
   displayName: 'Target Environment to deploy:    (select "development" for dev 1-14)'
   default: development
@@ -25,9 +20,6 @@ parameters:
     - development
     - tst
     - preprod
-    - preprod2
-    - prod
-    - DEV15    
 - name: imageTag
   displayName: Enter Tag for the Image (Docker tag) or Release name (Git repo tag)
   default: ''
@@ -46,18 +38,6 @@ variables:
     - name: env
       value: PRE1
     - template: vars/${{ parameters.envToDeploy }}.yaml
-  - ${{ elseif eq(parameters.envToDeploy, 'preprod2') }}:
-    - name: env
-      value: PRE2
-    - template: vars/${{ parameters.envToDeploy }}.yaml
-  - ${{ elseif eq(parameters.envToDeploy, 'prod') }}:
-    - name: env
-      value: PRD1
-    - template: vars/${{ parameters.envToDeploy }}.yaml
-  - ${{ elseif eq(parameters.envToDeploy, 'dev15') }}:
-    - name: env
-      value: DEV15
-    - template: vars/${{ parameters.envToDeploy }}.yaml    
 # Release tags reference
   - template: pipelines/image-tags/${{ parameters.envToDeploy }}.yaml@ReleaseTags
   - ${{ if eq(parameters.envToDeploy, 'development') }}:
