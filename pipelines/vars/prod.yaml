@@ -1,0 +1,12 @@
+variables:
+- group: ServiceConnections
+- name: azureSubscription
+  value: $(ServiceConnectionPRD1)
+- name: docker.imageName
+  value: 'eprliveservicefunctionapp'
+- name: acr.azureContainerRegistryName
+  value: 'prdrwdinfac1401'
+- name: acr.repositoryName
+  value: 'eprliveservicefunctionapprepository'
+- name: serviceName
+  value: 'PRDRWDWEBFA1480'
