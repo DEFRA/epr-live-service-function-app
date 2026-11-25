@@ -10,6 +10,7 @@ parameters:
   default: 'DEV8'
   type: string
   values:
+    - DEV1
     - DEV4
     - DEV8
 - name: envToDeploy
